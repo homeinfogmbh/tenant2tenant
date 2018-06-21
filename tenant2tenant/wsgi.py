@@ -5,7 +5,7 @@ from flask import request
 from his import CUSTOMER, authenticated, authorized, Application
 from wsgilib import JSON
 
-from damage_report.messages import NoSuchMessage, MessageToggled, \
+from tenant2tenant.messages import NoSuchMessage, MessageToggled, \
     MessageDeleted
 from digsigdb import TenantMessage
 

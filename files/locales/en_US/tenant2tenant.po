@@ -16,11 +16,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Hand\n"
 
-msgid "NoSuchReport"
-msgstr "No such damage report."
+msgid "NoSuchMessage"
+msgstr "No such message."
 
-msgid "ReportToggled"
-msgstr "Damage report toggled."
+msgid "MessageToggled"
+msgstr "Message toggled."
 
-msgid "ReportDeleted"
-msgstr "Damage report deleted."
+msgid "MessageDeleted"
+msgstr "Message deleted."

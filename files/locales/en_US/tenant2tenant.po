@@ -22,5 +22,8 @@ msgstr "No such message."
 msgid "MessageToggled"
 msgstr "Message toggled."
 
+msgid "MessagePatched"
+msgstr "Message patched."
+
 msgid "MessageDeleted"
 msgstr "Message deleted."

@@ -21,6 +21,12 @@ class MessageToggled(_TenantToTenantMessage):
     STATUS = 200
 
 
+class Messagepatched(_TenantToTenantMessage):
+    """Indicates that the respective message was patched."""
+
+    STATUS = 200
+
+
 class MessageDeleted(_TenantToTenantMessage):
     """Indicates that the respective message was deleted."""
 

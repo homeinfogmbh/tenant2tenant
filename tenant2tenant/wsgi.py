@@ -2,17 +2,20 @@
 
 from flask import request
 
-from his import CUSTOMER, authenticated, authorized, Application
+from his import DATA, CUSTOMER, authenticated, authorized, Application
+from his.messages import NoDataProvided
 from wsgilib import JSON
 
 from tenant2tenant.messages import NoSuchMessage, MessageToggled, \
-    MessageDeleted
+    MessagePatched, MessageDeleted
 from digsigdb import TenantMessage
 
 __all__ = ['APPLICATION']
 
 
 APPLICATION = Application('Tenant-to-tenant', cors=True, debug=True)
+_ALLOWED_PATCH_FIELDS = (
+    TenantMessage.start_date, TenantMessage.end_date, TenantMessage.released)
 
 
 def _get_messages(released=None):
@@ -76,9 +79,17 @@ def toggle_message(ident):
     """Toggles the respective message."""
 
     message = _get_message(ident)
-    message.released = not message.released
+
+    try:
+        json = DATA.json
+    except NoDataProvided:
+        message.released = not message.released
+        message.save()
+        return MessageToggled(released=message.released)
+
+    message = message.patch(json, allow=_ALLOWED_PATCH_FIELDS)
     message.save()
-    return MessageToggled(released=message.released)
+    return MessagePatched()
 
 
 @authenticated

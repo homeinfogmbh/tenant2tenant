@@ -22,5 +22,8 @@ msgstr "Keine solche Nachricht vorhanden."
 msgid "MessageToggled"
 msgstr "Nachricht umgeschaltet."
 
+msgid "MessagePatched"
+msgstr "Nachricht aktualisiert."
+
 msgid "MessageDeleted"
 msgstr "Nachricht gelöscht."

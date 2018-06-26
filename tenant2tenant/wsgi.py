@@ -75,7 +75,7 @@ def get_message(ident):
 
 @authenticated
 @authorized('tenant2tenant')
-def toggle_message(ident):
+def patch_message(ident):
     """Toggles the respective message."""
 
     message = _get_message(ident)
@@ -105,6 +105,6 @@ def delete_message(ident):
 ROUTES = (
     ('GET', '/', list_messages, 'list_messages'),
     ('GET', '/<int:ident>', get_message, 'get_message'),
-    ('PATCH', '/<int:ident>', toggle_message, 'toggle_message'),
+    ('PATCH', '/<int:ident>', patch_message, 'patch_message'),
     ('DELETE', '/<int:ident>', delete_message, 'delete_message'))
 APPLICATION.add_routes(ROUTES)

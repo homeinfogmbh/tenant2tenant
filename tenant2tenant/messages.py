@@ -2,6 +2,12 @@
 
 from his import Message
 
+__all__ = [
+    'NoSuchMessage',
+    'MessageToggled',
+    'MessagePatched',
+    'MessageDeleted']
+
 
 class _TenantToTenantMessage(Message):
     """Abstract base message."""
@@ -21,7 +27,7 @@ class MessageToggled(_TenantToTenantMessage):
     STATUS = 200
 
 
-class Messagepatched(_TenantToTenantMessage):
+class MessagePatched(_TenantToTenantMessage):
     """Indicates that the respective message was patched."""
 
     STATUS = 200

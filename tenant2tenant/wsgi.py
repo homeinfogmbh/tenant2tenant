@@ -2,7 +2,7 @@
 
 from flask import request
 
-from his import DATA, CUSTOMER, authenticated, authorized, Application
+from his import CUSTOMER, authenticated, authorized, Application
 from his.messages import NoDataProvided
 from wsgilib import JSON
 
@@ -81,7 +81,7 @@ def patch_message(ident):
     message = _get_message(ident)
 
     try:
-        json = DATA.json
+        json = request.json
     except NoDataProvided:
         message.released = not message.released
         message.save()

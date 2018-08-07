@@ -3,7 +3,6 @@
 from flask import request
 
 from his import CUSTOMER, authenticated, authorized, Application
-from his.messages import NoDataProvided
 from wsgilib import JSON
 
 from tenant2tenant.messages import NoSuchMessage, MessageToggled, \
@@ -79,10 +78,9 @@ def patch_message(ident):
     """Toggles the respective message."""
 
     message = _get_message(ident)
+    json = request.json
 
-    try:
-        json = request.json
-    except NoDataProvided:
+    if not json:
         message.released = not message.released
         message.save()
         return MessageToggled(released=message.released)

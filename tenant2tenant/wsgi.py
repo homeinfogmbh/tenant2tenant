@@ -60,7 +60,7 @@ def _get_message(ident):
 def list_messages():
     """Lists the tenant-to-tenant messages."""
 
-    return JSON([message.to_dict() for message in _get_messages(
+    return JSON([message.to_json() for message in _get_messages(
         _get_released())])
 
 
@@ -69,7 +69,7 @@ def list_messages():
 def get_message(ident):
     """Returns the respective message of the customer."""
 
-    return JSON(_get_message(ident).to_dict())
+    return JSON(_get_message(ident).to_json())
 
 
 @authenticated

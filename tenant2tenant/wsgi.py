@@ -13,8 +13,10 @@ __all__ = ['APPLICATION']
 
 
 APPLICATION = Application('Tenant-to-tenant', cors=True, debug=True)
-_ALLOWED_PATCH_FIELDS = (
-    TenantMessage.start_date, TenantMessage.end_date, TenantMessage.released)
+ALLOWED_PATCH_FIELDS = ('startDate', 'endDate', 'released')
+SKIPPED_PATCH_FIELDS = set(
+    key for key, *_ in TenantMessage.json_fields()
+    if key not in ALLOWED_PATCH_FIELDS)
 
 
 def _get_messages(released=None):
@@ -85,7 +87,7 @@ def patch_message(ident):
         message.save()
         return MessageToggled(released=message.released)
 
-    message = message.patch(json, allow=_ALLOWED_PATCH_FIELDS)
+    message = message.patch(json, skip=SKIPPED_PATCH_FIELDS)
     message.save()
     return MessagePatched()
 

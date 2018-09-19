@@ -6,7 +6,10 @@ __all__ = [
     'NoSuchMessage',
     'MessageToggled',
     'MessagePatched',
-    'MessageDeleted']
+    'MessageDeleted',
+    'EmailAdded',
+    'NoSuchEmail',
+    'EmailDeleted']
 
 
 class _TenantToTenantMessage(Message):
@@ -35,5 +38,23 @@ class MessagePatched(_TenantToTenantMessage):
 
 class MessageDeleted(_TenantToTenantMessage):
     """Indicates that the respective message was deleted."""
+
+    STATUS = 200
+
+
+class EmailAdded(_TenantToTenantMessage):
+    """Indicates that the email was added."""
+
+    STATUS = 200
+
+
+class NoSuchEmail(_TenantToTenantMessage):
+    """Indicates that the respective message does not exist."""
+
+    STATUS = 404
+
+
+class EmailDeleted(_TenantToTenantMessage):
+    """Indicates that the respective email was deleted."""
 
     STATUS = 200

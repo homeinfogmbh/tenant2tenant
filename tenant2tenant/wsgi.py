@@ -5,9 +5,14 @@ from flask import request
 from his import CUSTOMER, authenticated, authorized, Application
 from wsgilib import JSON
 
-from tenant2tenant.messages import NoSuchMessage, MessageToggled, \
-    MessagePatched, MessageDeleted
-from digsigdb import TenantMessage
+from tenant2tenant.messages import NoSuchMessage
+from tenant2tenant.messages import MessageToggled
+from tenant2tenant.messages import MessagePatched
+from tenant2tenant.messages import MessageDeleted
+from tenant2tenant.messages import EmailAdded
+from tenant2tenant.messages import NoSuchEmail
+from tenant2tenant.messages import EmailDeleted
+from tenant2tenant.orm import TenantMessage, NotificationEmail
 
 __all__ = ['APPLICATION']
 
@@ -102,9 +107,35 @@ def delete_message(ident):
     return MessageDeleted()
 
 
+@authenticated
+@authorized('tenant2tenant')
+def add_email():
+    """Deletes the respective message."""
+
+    email = NotificationEmail.add(request.text, CUSTOMER.id)
+    email.save()
+    return EmailAdded(id=email.id)
+
+
+@authenticated
+@authorized('tenant2tenant')
+def delete_email(ident):
+    """Deletes the respective message."""
+
+    try:
+        email = NotificationEmail.get(NotificationEmail.id == ident)
+    except NotificationEmail.DoesNotExist:
+        return NoSuchEmail()
+
+    email.delete_instance()
+    return EmailDeleted()
+
+
 ROUTES = (
-    ('GET', '/', list_messages, 'list_messages'),
-    ('GET', '/<int:ident>', get_message, 'get_message'),
-    ('PATCH', '/<int:ident>', patch_message, 'patch_message'),
-    ('DELETE', '/<int:ident>', delete_message, 'delete_message'))
+    ('GET', '/message', list_messages, 'list_messages'),
+    ('GET', '/message/<int:ident>', get_message, 'get_message'),
+    ('PATCH', '/message/<int:ident>', patch_message, 'patch_message'),
+    ('DELETE', '/message/<int:ident>', delete_message, 'delete_message'),
+    ('POST', '/email/<int:ident>', add_email, 'add_email'),
+    ('DELETE', '/email/<int:ident>', delete_email, 'delete_email'))
 APPLICATION.add_routes(ROUTES)

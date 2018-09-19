@@ -27,3 +27,12 @@ msgstr "Nachricht aktualisiert."
 
 msgid "MessageDeleted"
 msgstr "Nachricht gelöscht."
+
+msgid "EmailAdded"
+msgstr "E-Mail Adresse hinzugefügt."
+
+msgid "NoSuchEmail"
+msgstr "Die angeforderte E-Mail Adresse ist nicht vorhanden."
+
+msgid "EmailDeleted"
+msgstr "E-Mail Adresse gelöscht."

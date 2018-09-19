@@ -112,7 +112,7 @@ def delete_message(ident):
 def add_email():
     """Deletes the respective message."""
 
-    email = NotificationEmail.add(request.text, CUSTOMER.id)
+    email = NotificationEmail.from_json(request.json, CUSTOMER.id)
     email.save()
     return EmailAdded(id=email.id)
 

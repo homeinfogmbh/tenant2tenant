@@ -8,7 +8,7 @@ from peewee import ForeignKeyField, TextField, DateTimeField, BooleanField, \
 from mdb import Address, Customer
 from peeweeplus import MySQLDatabase, JSONModel
 
-from tenant2tenant import dom
+from tenant2tenant.dom import TenantMessage as TenantMessageDOM
 from tenant2tenant.config import CONFIG
 
 
@@ -84,7 +84,7 @@ class TenantMessage(_Tenant2TenantModel):
 
     def to_dom(self):
         """Returns the tenant message as XML DOM."""
-        xml = dom.TenantMessage(self.message)
+        xml = TenantMessageDOM(self.message)
         xml.created = self.created
         xml.released = self.released
         xml.startDate = self.start_date
@@ -100,3 +100,5 @@ class NotificationEmail(_Tenant2TenantModel):
 
     customer = ForeignKeyField(Customer, column_name='customer')
     email = CharField(255)
+    subject = CharField(255, null=True)
+    html = BooleanField(default=False)

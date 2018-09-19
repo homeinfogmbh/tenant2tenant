@@ -136,6 +136,6 @@ ROUTES = (
     ('GET', '/message/<int:ident>', get_message, 'get_message'),
     ('PATCH', '/message/<int:ident>', patch_message, 'patch_message'),
     ('DELETE', '/message/<int:ident>', delete_message, 'delete_message'),
-    ('POST', '/email/<int:ident>', add_email, 'add_email'),
+    ('POST', '/email', add_email, 'add_email'),
     ('DELETE', '/email/<int:ident>', delete_email, 'delete_email'))
 APPLICATION.add_routes(ROUTES)

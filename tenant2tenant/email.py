@@ -14,22 +14,27 @@ MAILER = Mailer.from_config(CONFIG['email'])
 
 
 @coerce(frozenset)
-def emails(message):
+def get_emails(message):
     """Yields notification emails."""
 
-    for email in NotificationEmail.select().where(
+    for notification_email in NotificationEmail.select().where(
             NotificationEmail.customer == message.customer):
-        recipient = email.email
-        subject = email.subject or CONFIG['email']['subject']
+        recipient = notification_email.email
+        subject = notification_email.subject or CONFIG['email']['subject']
         address = message.address
         subject = subject.format(address.street, address.house_number)
         sender = CONFIG['email']['from']
-        html = message.message if email.html else None
-        plain = None if email.html else message.message
+        html = message.message if notification_email.html else None
+        plain = None if notification_email.html else message.message
         yield EMail(subject, sender, recipient, plain=plain, html=html)
 
 
 def email(message):
     """Sends notifications emails."""
 
-    return MAILER.send(emails(message))
+    emails = get_emails(message)
+
+    if emails:
+        return MAILER.send(emails)
+
+    return None

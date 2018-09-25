@@ -109,8 +109,17 @@ def delete_message(ident):
 
 @authenticated
 @authorized('tenant2tenant')
-def add_email():
+def get_emails():
     """Deletes the respective message."""
+
+    return JSON([email.to_json() for email in NotificationEmail.select().where(
+        NotificationEmail.customer == CUSTOMER.id)])
+
+
+@authenticated
+@authorized('tenant2tenant')
+def add_email():
+    """Adds an email address."""
 
     email = NotificationEmail.from_json(request.json, CUSTOMER.id)
     email.save()
@@ -120,7 +129,7 @@ def add_email():
 @authenticated
 @authorized('tenant2tenant')
 def delete_email(ident):
-    """Deletes the respective message."""
+    """Deletes the respective email address."""
 
     try:
         email = NotificationEmail.get(NotificationEmail.id == ident)
@@ -136,6 +145,7 @@ ROUTES = (
     ('GET', '/message/<int:ident>', get_message, 'get_message'),
     ('PATCH', '/message/<int:ident>', patch_message, 'patch_message'),
     ('DELETE', '/message/<int:ident>', delete_message, 'delete_message'),
+    ('GET', '/email', get_emails, 'get_emails'),
     ('POST', '/email', add_email, 'add_email'),
     ('DELETE', '/email/<int:ident>', delete_email, 'delete_email'))
 APPLICATION.add_routes(ROUTES)

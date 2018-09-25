@@ -2,16 +2,14 @@
 
 from flask import request
 
-from his import CUSTOMER, authenticated, authorized, Application
+from his import CUSTOMER, authenticated, authorized, admin, Application
 from wsgilib import JSON
 
 from tenant2tenant.messages import NoSuchMessage
 from tenant2tenant.messages import MessageToggled
 from tenant2tenant.messages import MessagePatched
 from tenant2tenant.messages import MessageDeleted
-from tenant2tenant.messages import EmailAdded
-from tenant2tenant.messages import NoSuchEmail
-from tenant2tenant.messages import EmailDeleted
+from tenant2tenant.messages import EmailsUpdated
 from tenant2tenant.orm import TenantMessage, NotificationEmail
 
 __all__ = ['APPLICATION']
@@ -118,30 +116,7 @@ def get_emails():
 
 @authenticated
 @authorized('tenant2tenant')
-def add_email():
-    """Adds an email address."""
-
-    email = NotificationEmail.from_json(request.json, CUSTOMER.id)
-    email.save()
-    return EmailAdded(id=email.id)
-
-
-@authenticated
-@authorized('tenant2tenant')
-def delete_email(ident):
-    """Deletes the respective email address."""
-
-    try:
-        email = NotificationEmail.get(NotificationEmail.id == ident)
-    except NotificationEmail.DoesNotExist:
-        return NoSuchEmail()
-
-    email.delete_instance()
-    return EmailDeleted()
-
-
-@authenticated
-@authorized('tenant2tenant')
+@admin
 def set_emails():
     """Replaces all email address of the respective customer."""
 
@@ -157,7 +132,7 @@ def set_emails():
         email.save()
         ids.append(email.id)
 
-    return EmailAdded(ids=ids)
+    return EmailsUpdated(ids=ids)
 
 
 ROUTES = (
@@ -166,7 +141,5 @@ ROUTES = (
     ('PATCH', '/message/<int:ident>', patch_message, 'patch_message'),
     ('DELETE', '/message/<int:ident>', delete_message, 'delete_message'),
     ('GET', '/email', get_emails, 'get_emails'),
-    ('POST', '/email', add_email, 'add_email'),
-    ('DELETE', '/email/<int:ident>', delete_email, 'delete_email'),
-    ('POST', '/emails', set_emails, 'set_emails'))
+    ('POST', '/email', set_emails, 'set_emails'))
 APPLICATION.add_routes(ROUTES)

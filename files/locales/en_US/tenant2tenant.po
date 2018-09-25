@@ -28,11 +28,5 @@ msgstr "Message patched."
 msgid "MessageDeleted"
 msgstr "Message deleted."
 
-msgid "EmailAdded"
-msgstr "Email address has been added."
-
-msgid "NoSuchEmail"
-msgstr "The requested email address does not exist."
-
-msgid "EmailDeleted"
-msgstr "Email address has been deleted."
+msgid "EmailsUpdated"
+msgstr "Email addresses updated."

@@ -153,7 +153,7 @@ def set_emails():
         email.delete_instance()
 
     for email in emails:
-        email = NotificationEmail.from_json(request.json, CUSTOMER.id)
+        email = NotificationEmail.from_json(email, CUSTOMER.id)
         email.save()
         ids.append(email.id)
 

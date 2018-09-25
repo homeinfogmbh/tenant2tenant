@@ -102,3 +102,10 @@ class NotificationEmail(_Tenant2TenantModel):
     email = CharField(255)
     subject = CharField(255, null=True)
     html = BooleanField(default=False)
+
+    @classmethod
+    def from_json(cls, json, customer, **kwargs):
+        """Creates a notification email for the respective customer."""
+        record = super().from_json(json, **kwargs)
+        record.customer = customer
+        return record

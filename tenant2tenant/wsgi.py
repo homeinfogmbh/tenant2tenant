@@ -140,6 +140,26 @@ def delete_email(ident):
     return EmailDeleted()
 
 
+@authenticated
+@authorized('tenant2tenant')
+def set_emails():
+    """Replaces all email address of the respective customer."""
+
+    emails = request.json
+    ids = []
+
+    for email in NotificationEmail.select().where(
+            NotificationEmail.customer == CUSTOMER.id):
+        email.delete_instance()
+
+    for email in emails:
+        email = NotificationEmail.from_json(request.json, CUSTOMER.id)
+        email.save()
+        ids.append(email.id)
+
+    return EmailAdded(ids=ids)
+
+
 ROUTES = (
     ('GET', '/message', list_messages, 'list_messages'),
     ('GET', '/message/<int:ident>', get_message, 'get_message'),
@@ -147,5 +167,6 @@ ROUTES = (
     ('DELETE', '/message/<int:ident>', delete_message, 'delete_message'),
     ('GET', '/email', get_emails, 'get_emails'),
     ('POST', '/email', add_email, 'add_email'),
-    ('DELETE', '/email/<int:ident>', delete_email, 'delete_email'))
+    ('DELETE', '/email/<int:ident>', delete_email, 'delete_email'),
+    ('POST', '/emails', set_emails, 'set_emails'))
 APPLICATION.add_routes(ROUTES)

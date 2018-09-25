@@ -92,7 +92,7 @@ def patch_message(ident):
         message.save()
         return MessageToggled(released=message.released)
 
-    message = message.patch(json, skip=SKIPPED_PATCH_FIELDS)
+    message.patch_json(json, skip=SKIPPED_PATCH_FIELDS)
     message.save()
     return MessagePatched()
 

@@ -2,8 +2,12 @@
 
 from datetime import datetime, date
 
-from peewee import ForeignKeyField, TextField, DateTimeField, BooleanField, \
-    CharField, DateField
+from peewee import BooleanField
+from peewee import CharField
+from peewee import DateField
+from peewee import DateTimeField
+from peewee import ForeignKeyField
+from peewee import TextField
 
 from mdb import Address, Customer
 from peeweeplus import MySQLDatabase, JSONModel

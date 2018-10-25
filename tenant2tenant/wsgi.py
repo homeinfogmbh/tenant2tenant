@@ -15,7 +15,7 @@ from tenant2tenant.orm import TenantMessage, NotificationEmail
 __all__ = ['APPLICATION']
 
 
-APPLICATION = Application('Tenant-to-tenant', cors=True, debug=True)
+APPLICATION = Application('Tenant-to-tenant', debug=True)
 ALLOWED_PATCH_FIELDS = ('startDate', 'endDate', 'released')
 SKIPPED_PATCH_FIELDS = set(
     key for key, *_ in TenantMessage.json_fields()

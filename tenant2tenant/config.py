@@ -1,9 +1,9 @@
 """Configuration file parser."""
 
-from configlib import INIParser
+from configlib import loadcfg
 
 
 __all__ = ['CONFIG']
 
 
-CONFIG = INIParser('/etc/tenant2tenant.conf')
+CONFIG = loadcfg('tenant2tenant.conf')

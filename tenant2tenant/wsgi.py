@@ -5,11 +5,11 @@ from flask import request
 from his import CUSTOMER, authenticated, authorized, admin, Application
 from wsgilib import JSON
 
-from tenant2tenant.messages import NO_SUCH_MESSAGE
+from tenant2tenant.messages import EMAILS_UPDATED
 from tenant2tenant.messages import MESSAGE_TOGGLED
 from tenant2tenant.messages import MESSAGE_PATCHED
 from tenant2tenant.messages import MESSAGE_DELETED
-from tenant2tenant.messages import EMAILS_UPDATED
+from tenant2tenant.messages import NO_SUCH_MESSAGE
 from tenant2tenant.orm import TenantMessage, NotificationEmail
 
 __all__ = ['APPLICATION']

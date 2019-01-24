@@ -12,7 +12,7 @@ from peewee import TextField
 from mdb import Address, Customer
 from peeweeplus import MySQLDatabase, JSONModel
 
-from tenant2tenant.dom import TenantMessage as TenantMessageDOM
+from tenant2tenant import dom   # pylint: disable=E0611
 from tenant2tenant.config import CONFIG
 
 
@@ -25,7 +25,7 @@ DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 class _Tenant2TenantModel(JSONModel):
     """Basic model for this database."""
 
-    class Meta:     # pylint: disable=C0111
+    class Meta:     # pylint: disable=C0111,R0903
         database = DATABASE
         schema = database.database
 
@@ -33,7 +33,7 @@ class _Tenant2TenantModel(JSONModel):
 class TenantMessage(_Tenant2TenantModel):
     """Tenant to tenant messages."""
 
-    class Meta:     # pylint: disable=C0111
+    class Meta:     # pylint: disable=C0111,R0903
         table_name = 'tenant_message'
 
     customer = ForeignKeyField(Customer, column_name='customer')
@@ -88,7 +88,7 @@ class TenantMessage(_Tenant2TenantModel):
 
     def to_dom(self):
         """Returns the tenant message as XML DOM."""
-        xml = TenantMessageDOM(self.message)
+        xml = dom.TenantMessage(self.message)
         xml.created = self.created
         xml.released = self.released
         xml.startDate = self.start_date
@@ -99,7 +99,7 @@ class TenantMessage(_Tenant2TenantModel):
 class NotificationEmail(_Tenant2TenantModel):
     """Stores emails for notifications about new messages."""
 
-    class Meta:     # pylint: disable=C0111
+    class Meta:     # pylint: disable=C0111,R0903
         table_name = 'notification_emails'
 
     customer = ForeignKeyField(Customer, column_name='customer')

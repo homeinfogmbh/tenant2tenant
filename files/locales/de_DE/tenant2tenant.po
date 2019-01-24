@@ -16,17 +16,22 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Hand\n"
 
-msgid "NoSuchMessage"
-msgstr "Keine solche Nachricht vorhanden."
+#: messages.py:15
+msgid "The requested message does not exist."
+msgstr "Die gewünschte Nachricht existiert nicht."
 
-msgid "MessageToggled"
-msgstr "Nachricht umgeschaltet."
+#: messages.py:17
+msgid "The message has been toggled."
+msgstr "Die Freischaltung der Nachricht wurde umgeschaltet."
 
-msgid "MessagePatched"
-msgstr "Nachricht aktualisiert."
+#: messages.py:18
+msgid "The message has been updated."
+msgstr "Die Nachricht wurde aktualisiert."
 
-msgid "MessageDeleted"
-msgstr "Nachricht gelöscht."
+#: messages.py:19
+msgid "The message has been deleted"
+msgstr "Die Nachricht wurde gelöscht."
 
-msgid "EmailsUpdated"
-msgstr "E-Mail Adressen aktualisiert."
+#: messages.py:20
+msgid "The emails list has been updated."
+msgstr "Die E-Mail Adressen wurden aktualisiert."

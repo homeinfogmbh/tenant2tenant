@@ -1,46 +1,20 @@
 """WSGI Messages."""
 
-from his import Message
+from his import HIS_MESSAGE_FACILITY
 
 __all__ = [
-    'NoSuchMessage',
-    'MessageToggled',
-    'MessagePatched',
-    'MessageDeleted',
-    'EmailsUpdated']
+    'NO_SUCH_MESSAGE',
+    'MESSAGE_TOGGLED',
+    'MESSAGE_PATCHED',
+    'MESSAGE_DELETED',
+    'EMAILS_UPDATED']
 
 
-class _TenantToTenantMessage(Message):
-    """Abstract base message."""
-
-    DOMAIN = 'tenant2tenant'
-
-
-class NoSuchMessage(_TenantToTenantMessage):
-    """Indicates that the respective message does not exist."""
-
-    STATUS = 404
-
-
-class MessageToggled(_TenantToTenantMessage):
-    """Indicates that the respective message was toggled."""
-
-    STATUS = 200
-
-
-class MessagePatched(_TenantToTenantMessage):
-    """Indicates that the respective message was patched."""
-
-    STATUS = 200
-
-
-class MessageDeleted(_TenantToTenantMessage):
-    """Indicates that the respective message was deleted."""
-
-    STATUS = 200
-
-
-class EmailsUpdated(_TenantToTenantMessage):
-    """Indicates that the emails were successfully updated."""
-
-    STATUS = 200
+TT_DOMAIN = HIS_MESSAGE_FACILITY.domain('tenant2tenant')
+TT_MESSAGE = TT_DOMAIN.message
+NO_SUCH_MESSAGE = TT_MESSAGE(
+    'The requested message does not exist.', status=404)
+MESSAGE_TOGGLED = TT_MESSAGE('The message has been toggled.', status=200)
+MESSAGE_PATCHED = TT_MESSAGE('The message has been updated.', status=200)
+MESSAGE_DELETED = TT_MESSAGE('The message has been deleted.', status=200)
+EMAILS_UPDATED = TT_MESSAGE('The emails list has been updated.', status=200)

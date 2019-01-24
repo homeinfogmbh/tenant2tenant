@@ -5,11 +5,11 @@ from flask import request
 from his import CUSTOMER, authenticated, authorized, admin, Application
 from wsgilib import JSON
 
-from tenant2tenant.messages import NoSuchMessage
-from tenant2tenant.messages import MessageToggled
-from tenant2tenant.messages import MessagePatched
-from tenant2tenant.messages import MessageDeleted
-from tenant2tenant.messages import EmailsUpdated
+from tenant2tenant.messages import NO_SUCH_MESSAGE
+from tenant2tenant.messages import MESSAGE_TOGGLED
+from tenant2tenant.messages import MESSAGE_PATCHED
+from tenant2tenant.messages import MESSAGE_DELETED
+from tenant2tenant.messages import EMAILS_UPDATED
 from tenant2tenant.orm import TenantMessage, NotificationEmail
 
 __all__ = ['APPLICATION']
@@ -57,7 +57,7 @@ def _get_message(ident):
             (TenantMessage.id == ident)
             & (TenantMessage.customer == CUSTOMER.id))
     except TenantMessage.DoesNotExist:
-        raise NoSuchMessage()
+        raise NO_SUCH_MESSAGE
 
 
 @authenticated
@@ -88,11 +88,11 @@ def patch_message(ident):
     if not json:
         message.released = not message.released
         message.save()
-        return MessageToggled(released=message.released)
+        return MESSAGE_TOGGLED.update(released=message.released)
 
     message.patch_json(json, skip=SKIPPED_PATCH_FIELDS)
     message.save()
-    return MessagePatched()
+    return MESSAGE_PATCHED
 
 
 @authenticated
@@ -102,7 +102,7 @@ def delete_message(ident):
 
     message = _get_message(ident)
     message.delete_instance()
-    return MessageDeleted()
+    return MESSAGE_DELETED
 
 
 @authenticated
@@ -132,7 +132,7 @@ def set_emails():
         email.save()
         ids.append(email.id)
 
-    return EmailsUpdated(ids=ids)
+    return EMAILS_UPDATED.update(ids=ids)
 
 
 ROUTES = (

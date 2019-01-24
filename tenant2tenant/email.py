@@ -34,7 +34,7 @@ def email(message):
 
     emails = get_emails(message)
 
-    if emails:
+    if emails:  # pylint: disable=W0125
         return MAILER.send(emails)
 
     return None

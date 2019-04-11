@@ -79,18 +79,22 @@ def get_message(ident):
 
 @authenticated
 @authorized('tenant2tenant')
+def toggle_message(ident):
+    """Toggles the respective message."""
+
+    message = _get_message(ident)
+    message.released = not message.released
+    message.save()
+    return MESSAGE_TOGGLED.update(released=message.released)
+
+
+@authenticated
+@authorized('tenant2tenant')
 def patch_message(ident):
     """Toggles the respective message."""
 
     message = _get_message(ident)
-    json = request.json
-
-    if not json:
-        message.released = not message.released
-        message.save()
-        return MESSAGE_TOGGLED.update(released=message.released)
-
-    message.patch_json(json, skip=SKIPPED_PATCH_FIELDS)
+    message.patch_json(request.json, skip=SKIPPED_PATCH_FIELDS)
     message.save()
     return MESSAGE_PATCHED
 
@@ -138,6 +142,7 @@ def set_emails():
 ROUTES = (
     ('GET', '/message', list_messages, 'list_messages'),
     ('GET', '/message/<int:ident>', get_message, 'get_message'),
+    ('PUT', '/message/<int:ident>', toggle_message, 'toggle_message'),
     ('PATCH', '/message/<int:ident>', patch_message, 'patch_message'),
     ('DELETE', '/message/<int:ident>', delete_message, 'delete_message'),
     ('GET', '/email', get_emails, 'get_emails'),

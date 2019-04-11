@@ -16,7 +16,7 @@ __all__ = ['APPLICATION']
 
 
 APPLICATION = Application('Tenant-to-tenant', debug=True)
-ALLOWED_PATCH_FIELDS = ('startDate', 'endDate', 'released')
+ALLOWED_PATCH_FIELDS = ('startDate', 'endDate', 'released', 'message')
 SKIPPED_PATCH_FIELDS = set(
     key for key, *_ in TenantMessage.json_fields()
     if key not in ALLOWED_PATCH_FIELDS)

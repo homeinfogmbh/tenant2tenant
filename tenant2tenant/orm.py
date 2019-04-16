@@ -54,15 +54,15 @@ class TenantMessage(_Tenant2TenantModel):
         return record
 
     @classmethod
-    def from_location(cls, location, message):
-        """Creates a new entry for the respective location."""
-        return cls.add(location.customer, location.address, message)
+    def from_deployment(cls, deployment, message):
+        """Creates a new entry for the respective deployment."""
+        return cls.add(deployment.customer, deployment.address, message)
 
     @classmethod
-    def for_location(cls, location):
-        """Yields released, active records for the respective location."""
-        condition = cls.customer == location.customer
-        condition &= cls.address == location.address
+    def for_deployment(cls, deployment):
+        """Yields released, active records for the respective deployment."""
+        condition = cls.customer == deployment.customer
+        condition &= cls.address == deployment.address
         condition &= cls.released == 1
         today = date.today()
         condition &= (cls.start_date >> None) | (cls.start_date <= today)

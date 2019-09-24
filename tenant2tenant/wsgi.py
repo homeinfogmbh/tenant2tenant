@@ -2,10 +2,10 @@
 
 from flask import request
 
-from his import CUSTOMER, authenticated, authorized, admin, Application
+from his import CUSTOMER, authenticated, authorized, Application
+from notificationlib import get_wsgi_funcs
 from wsgilib import JSON
 
-from tenant2tenant.messages import EMAILS_UPDATED
 from tenant2tenant.messages import MESSAGE_TOGGLED
 from tenant2tenant.messages import MESSAGE_PATCHED
 from tenant2tenant.messages import MESSAGE_DELETED
@@ -109,34 +109,7 @@ def delete_message(ident):
     return MESSAGE_DELETED
 
 
-@authenticated
-@authorized('tenant2tenant')
-def get_emails():
-    """Deletes the respective message."""
-
-    return JSON([email.to_json() for email in NotificationEmail.select().where(
-        NotificationEmail.customer == CUSTOMER.id)])
-
-
-@authenticated
-@authorized('tenant2tenant')
-@admin
-def set_emails():
-    """Replaces all email address of the respective customer."""
-
-    emails = request.json
-    ids = []
-
-    for email in NotificationEmail.select().where(
-            NotificationEmail.customer == CUSTOMER.id):
-        email.delete_instance()
-
-    for email in emails:
-        email = NotificationEmail.from_json(email, CUSTOMER.id)
-        email.save()
-        ids.append(email.id)
-
-    return EMAILS_UPDATED.update(ids=ids)
+GET_EMAILS, SET_EMAILS = get_wsgi_funcs('tenant2tenant', NotificationEmail)
 
 
 ROUTES = (
@@ -145,6 +118,6 @@ ROUTES = (
     ('PUT', '/message/<int:ident>', toggle_message, 'toggle_message'),
     ('PATCH', '/message/<int:ident>', patch_message, 'patch_message'),
     ('DELETE', '/message/<int:ident>', delete_message, 'delete_message'),
-    ('GET', '/email', get_emails, 'get_emails'),
-    ('POST', '/email', set_emails, 'set_emails'))
+    ('GET', '/email', GET_EMAILS, 'get_emails'),
+    ('POST', '/email', SET_EMAILS, 'set_emails'))
 APPLICATION.add_routes(ROUTES)

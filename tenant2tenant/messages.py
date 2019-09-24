@@ -6,8 +6,8 @@ __all__ = [
     'NO_SUCH_MESSAGE',
     'MESSAGE_TOGGLED',
     'MESSAGE_PATCHED',
-    'MESSAGE_DELETED',
-    'EMAILS_UPDATED']
+    'MESSAGE_DELETED'
+]
 
 
 NO_SUCH_MESSAGE = JSONMessage(
@@ -15,4 +15,3 @@ NO_SUCH_MESSAGE = JSONMessage(
 MESSAGE_TOGGLED = JSONMessage('The message has been toggled.', status=200)
 MESSAGE_PATCHED = JSONMessage('The message has been updated.', status=200)
 MESSAGE_DELETED = JSONMessage('The message has been deleted.', status=200)
-EMAILS_UPDATED = JSONMessage('The emails list has been updated.', status=200)

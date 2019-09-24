@@ -1,16 +1,14 @@
 """Emailing of new tenant-to-tenant messages."""
 
-from emaillib import EMail, Mailer
+from emaillib import EMail
 from functoolsplus import coerce
+from notificationlib import EMailFacility
 
 from tenant2tenant.config import CONFIG
 from tenant2tenant.orm import NotificationEmail
 
 
 __all__ = ['email']
-
-
-MAILER = Mailer.from_config(CONFIG['email'])
 
 
 @coerce(frozenset)
@@ -29,12 +27,5 @@ def get_emails(message):
         yield EMail(subject, sender, recipient, plain=plain, html=html)
 
 
-def email(message):
-    """Sends notifications emails."""
-
-    emails = get_emails(message)
-
-    if emails:  # pylint: disable=W0125
-        return MAILER.send(emails)
-
-    return None
+EMAIL_FACILITY = EMailFacility(CONFIG['email'], get_emails)
+email = EMAIL_FACILITY.email    # pylint: disable=C0103

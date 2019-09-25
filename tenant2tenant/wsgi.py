@@ -116,7 +116,7 @@ GET_EMAILS, SET_EMAILS = get_wsgi_funcs('tenant2tenant', NotificationEmail)
 
 
 @preview(DeploymentPreviewToken)
-def preview_(deployment):
+def deployment_preview(deployment):
     """Returns the tenant-to-tenant preview
     messages for the requested deployment.
     """
@@ -145,5 +145,5 @@ APPLICATION.add_routes((
     ('DELETE', '/message/<int:ident>', delete_message, 'delete_message'),
     ('GET', '/email', GET_EMAILS, 'get_emails'),
     ('POST', '/email', SET_EMAILS, 'set_emails'),
-    ('GET', '/preview', preview_)
+    ('GET', '/preview/deployment', deployment_preview)
 ))

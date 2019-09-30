@@ -10,7 +10,9 @@ from tenant2tenant.messages import MESSAGE_TOGGLED
 from tenant2tenant.messages import MESSAGE_PATCHED
 from tenant2tenant.messages import MESSAGE_DELETED
 from tenant2tenant.messages import NO_SUCH_MESSAGE
-from tenant2tenant.orm import TenantMessage, NotificationEmail
+from tenant2tenant.messages import NO_SUCH_CONFIGURATION
+from tenant2tenant.messages import CONFIGURATION_SET
+from tenant2tenant.orm import Configuration, TenantMessage, NotificationEmail
 
 
 __all__ = ['APPLICATION']
@@ -108,6 +110,37 @@ def delete_message(ident):
     message = _get_message(ident)
     message.delete_instance()
     return MESSAGE_DELETED
+
+
+@authenticated
+@authorized('tenant2tenant')
+def get_config():
+    """Returns the configuration of the respective customer."""
+    try:
+        configuration = Configuration.get(
+            Configuration.customer == CUSTOMER.id)
+    except Configuration.DoesNotExist:
+        return NO_SUCH_CONFIGURATION
+
+    return JSON(configuration.to_json())
+
+
+@authenticated
+@authorized('tenant2tenant')
+def set_config():
+    """Sets the configuration for the respective customer."""
+    try:
+        configuration = Configuration.get(
+            Configuration.customer == CUSTOMER.id)
+    except Configuration.DoesNotExist:
+        configuration = Configuration.from_json(request.json)
+        configuration.customer = CUSTOMER.id
+        configuration.save()
+    else:
+        configuration.patch_json(request.json)
+        configuration.save()
+
+    return CONFIGURATION_SET
 
 
 GET_EMAILS, SET_EMAILS = get_wsgi_funcs('tenant2tenant', NotificationEmail)

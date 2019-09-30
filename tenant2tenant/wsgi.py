@@ -147,11 +147,13 @@ GET_EMAILS, SET_EMAILS = get_wsgi_funcs('tenant2tenant', NotificationEmail)
 
 
 APPLICATION.add_routes((
-    ('GET', '/message', list_messages, 'list_messages'),
-    ('GET', '/message/<int:ident>', get_message, 'get_message'),
-    ('PUT', '/message/<int:ident>', toggle_message, 'toggle_message'),
-    ('PATCH', '/message/<int:ident>', patch_message, 'patch_message'),
-    ('DELETE', '/message/<int:ident>', delete_message, 'delete_message'),
-    ('GET', '/email', GET_EMAILS, 'get_emails'),
-    ('POST', '/email', SET_EMAILS, 'set_emails')
+    ('GET', '/message', list_messages),
+    ('GET', '/message/<int:ident>', get_message),
+    ('PUT', '/message/<int:ident>', toggle_message),
+    ('PATCH', '/message/<int:ident>', patch_message),
+    ('DELETE', '/message/<int:ident>', delete_message),
+    ('GET', '/configuration', get_config),
+    ('POST', '/configuration', set_config),
+    ('GET', '/email', GET_EMAILS),
+    ('POST', '/email', SET_EMAILS)
 ))

@@ -16,7 +16,7 @@ from tenant2tenant import dom   # pylint: disable=E0611
 from tenant2tenant.config import CONFIG
 
 
-__all__ = ['TenantMessage', 'NotificationEmail']
+__all__ = ['Configuration', 'TenantMessage', 'NotificationEmail']
 
 
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
@@ -28,6 +28,22 @@ class _Tenant2TenantModel(JSONModel):
     class Meta:     # pylint: disable=C0111,R0903
         database = DATABASE
         schema = database.database
+
+
+class Configuration(_Tenant2TenantModel):
+    """Customer-specific configuration."""
+
+    customer = ForeignKeyField(
+        Customer, column_name='customer', on_delete='CASCADE')
+    auto_release = BooleanField(default=False)
+
+    @classmethod
+    def for_customer(cls, customer):
+        """Returns the configuration for the respective customer."""
+        try:
+            return cls.get(cls.customer == customer)
+        except cls.DoesNotExist:
+            return cls()
 
 
 class TenantMessage(_Tenant2TenantModel):

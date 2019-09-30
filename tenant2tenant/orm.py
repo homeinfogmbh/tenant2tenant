@@ -1,7 +1,8 @@
 """Tenant-to-tenant messaging ORM models."""
 
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
+from peewee import BigIntegerField
 from peewee import BooleanField
 from peewee import DateField
 from peewee import DateTimeField
@@ -36,6 +37,7 @@ class Configuration(_Tenant2TenantModel):
     customer = ForeignKeyField(
         Customer, column_name='customer', on_delete='CASCADE')
     auto_release = BooleanField(default=False)
+    release_sec = BigIntegerField(default=432000)
 
     @classmethod
     def for_customer(cls, customer):
@@ -44,6 +46,11 @@ class Configuration(_Tenant2TenantModel):
             return cls.get(cls.customer == customer)
         except cls.DoesNotExist:
             return cls()
+
+    @property
+    def release_time(self):
+        """Returns a timedelta of the specified release time."""
+        return timedelta(seconds=self.release_sec)
 
 
 class TenantMessage(_Tenant2TenantModel):

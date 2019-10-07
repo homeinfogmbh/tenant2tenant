@@ -4,8 +4,10 @@ from flask import request
 
 from his import CUSTOMER, authenticated, authorized, Application
 from notificationlib import get_wsgi_funcs
-from wsgilib import JSON
+from previewlib import preview, DeploymentPreviewToken
+from wsgilib import JSON, XML
 
+from tenant2tenant.dom import tenant2tenant
 from tenant2tenant.messages import MESSAGE_TOGGLED
 from tenant2tenant.messages import MESSAGE_PATCHED
 from tenant2tenant.messages import MESSAGE_DELETED
@@ -25,10 +27,10 @@ SKIPPED_PATCH_FIELDS = set(
     if key not in ALLOWED_PATCH_FIELDS)
 
 
-def _get_messages(released=None):
+def _get_messages(customer, released):
     """Yields the customer's tenant-to-tenant messages."""
 
-    expression = TenantMessage.customer == CUSTOMER.id
+    expression = TenantMessage.customer == customer
 
     if released is not None:
         expression &= TenantMessage.released == int(released)
@@ -69,7 +71,7 @@ def list_messages():
     """Lists the tenant-to-tenant messages."""
 
     return JSON([message.to_json() for message in _get_messages(
-        _get_released())])
+        CUSTOMER.id, _get_released())])
 
 
 @authenticated
@@ -146,6 +148,18 @@ def set_config():
 GET_EMAILS, SET_EMAILS = get_wsgi_funcs('tenant2tenant', NotificationEmail)
 
 
+@preview(DeploymentPreviewToken)
+def preview_deployment(deployment):
+    """Returns a preview of the respective tenant-to-tenant messages."""
+
+    xml = tenant2tenant()
+
+    for message in TenantMessage.for_deployment(deployment):
+        xml.message.append(message.to_dom())
+
+    return XML(xml)
+
+
 APPLICATION.add_routes((
     ('GET', '/message', list_messages),
     ('GET', '/message/<int:ident>', get_message),
@@ -155,5 +169,6 @@ APPLICATION.add_routes((
     ('GET', '/configuration', get_config),
     ('POST', '/configuration', set_config),
     ('GET', '/email', GET_EMAILS),
-    ('POST', '/email', SET_EMAILS)
+    ('POST', '/email', SET_EMAILS),
+    ('GET', '/preview', preview_deployment)
 ))

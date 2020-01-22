@@ -20,7 +20,9 @@ def get_emails(message):
         recipient = notification_email.email
         subject = notification_email.subject or CONFIG['email']['subject']
         address = message.address
-        subject = subject.format(address.street, address.house_number)
+        subject = subject.format(
+            address.street, address.house_number, address.zip_code,
+            address.city)
         sender = CONFIG['email']['from']
         html = message.message if notification_email.html else None
         plain = None if notification_email.html else message.message

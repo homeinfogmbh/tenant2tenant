@@ -10,7 +10,7 @@ from peewee import ForeignKeyField
 from peewee import TextField
 
 from mdb import Address, Customer
-from notificationlib import get_orm_model
+from notificationlib import get_email_orm_model
 from peeweeplus import MySQLDatabase, JSONModel
 
 from tenant2tenant import dom   # pylint: disable=E0611
@@ -119,4 +119,4 @@ class TenantMessage(_Tenant2TenantModel):
         return xml
 
 
-NotificationEmail = get_orm_model(_Tenant2TenantModel)
+NotificationEmail = get_email_orm_model(_Tenant2TenantModel)

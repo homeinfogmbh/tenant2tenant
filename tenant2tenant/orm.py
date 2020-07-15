@@ -62,7 +62,7 @@ class TenantMessage(_Tenant2TenantModel):
 
     customer = ForeignKeyField(Customer, column_name='customer')
     address = ForeignKeyField(Address, column_name='address')
-    subject = TextField()
+    subject = TextField(null=True)
     message = TextField()
     visibility = EnumField(Visibility, default=Visibility.TENEMENT)
     created = DateTimeField(default=datetime.now)

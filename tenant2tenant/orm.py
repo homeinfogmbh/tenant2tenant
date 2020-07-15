@@ -11,10 +11,11 @@ from peewee import TextField
 
 from mdb import Address, Customer
 from notificationlib import get_email_orm_model
-from peeweeplus import MySQLDatabase, JSONModel
+from peeweeplus import EnumField, JSONModel, MySQLDatabase
 
 from tenant2tenant import dom   # pylint: disable=E0611
 from tenant2tenant.config import CONFIG
+from tenant2tenant.enumerations import Visibility
 
 
 __all__ = ['Configuration', 'TenantMessage', 'NotificationEmail']
@@ -23,7 +24,7 @@ __all__ = ['Configuration', 'TenantMessage', 'NotificationEmail']
 DATABASE = MySQLDatabase.from_config(CONFIG['db'])
 
 
-class _Tenant2TenantModel(JSONModel):
+class _Tenant2TenantModel(JSONModel):   # pylint: disable=R0903
     """Basic model for this database."""
 
     class Meta:     # pylint: disable=C0111,R0903
@@ -61,8 +62,11 @@ class TenantMessage(_Tenant2TenantModel):
 
     customer = ForeignKeyField(Customer, column_name='customer')
     address = ForeignKeyField(Address, column_name='address')
+    subject = TextField()
     message = TextField()
+    visibility = EnumField(Visibility, default=Visibility.TENEMENT)
     created = DateTimeField(default=datetime.now)
+    # Set by customer, not by end-user.
     released = BooleanField(default=False)
     start_date = DateField(null=True, default=None)
     end_date = DateField(null=True, default=None)

@@ -221,7 +221,7 @@ function getEmails () {
         const trimmedEmailAddress = emailAddress.trim();
 
         if (trimmedEmailAddress != '') {
-            emails.push({email: trimmedEmailAddress, 'html':true};);
+            emails.push({email: trimmedEmailAddress, 'html':true});
         }
     }
 

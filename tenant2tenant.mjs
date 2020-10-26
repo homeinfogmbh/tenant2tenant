@@ -40,6 +40,15 @@ function listElement (record, i) {
 	const oneweek = new Date(record.created);
 	oneweek.setDate(oneweek.getDate() + 7);
 	const  enddatestring = oneweek.getFullYear() + "-" + ("0"+(oneweek.getMonth()+1)).slice(-2) + '-' + ("0"+oneweek.getDate()).slice(-2);
+	const row = document.createElement('tr');
+	row.classList.add(record.released ? 'success' :'danger');
+	const colId = document.createElement('td');
+	colId.textContent = '' + (i + 1);
+	row.appendChild(colId);
+	const colCreated = document.createElement('td');
+	colCreated.textContent = record.created.split('T').join(' ');
+    row.appendChild(colCreated);
+
     return '<tr class="' + (record.released ?'success' :'danger') + '">' +
         '<td>' + (i+1) + "</td>" +
         '<td>' + record.created.split('T').join(' ') + '</td>' +
@@ -59,13 +68,12 @@ function listElement (record, i) {
     between released and not released.
 */
 function toggle (ident, startDate, endDate) {
-    var args = getEnviron();
 	startDate = startDate === '' || startDate == null ?null :startDate;
 	endDate = endDate === '' || endDate == null ?null :endDate;
-	var promises = [];
+	const promises = [];
 	promises.push(updateStartDate(ident, startDate));
 	promises.push(updateEndDate(ident, endDate));
-	promises.push(request.put('https://backend.homeinfo.de/tenant2tenant/message/' + ident, args));
+	promises.push(request.put('https://backend.homeinfo.de/tenant2tenant/message/' + ident, null, getEnviron()));
 	Promise.all(promises).then(init);
 }
 
@@ -74,8 +82,7 @@ function toggle (ident, startDate, endDate) {
     Deletes the entry with the respective ID.
 */
 function delete (ident) {
-    var args = getEnviron();
-    request.delete('https://backend.homeinfo.de/tenant2tenant/message/' + ident, args).then(init);
+    request.delete('https://backend.homeinfo.de/tenant2tenant/message/' + ident, getEnviron()).then(init);
 }
 
 
@@ -86,8 +93,8 @@ function list (entries) {
 	entries.sort(function(b, a) {
 		return compareStrings(a.created, b.created);
 	});
-    var elements = 'Es wurden keine Nachrichten geschrieben.';
-    for (var i = 0; i < entries.length; i++)
+    let elements = 'Es wurden keine Nachrichten geschrieben.';
+    for (let i = 0; i < entries.length; i++)
         elements += listElement(entries[i], i);
 	$('#messages').html(elements);
 	$('.btn_save_text').click(function() {
@@ -146,16 +153,14 @@ function list (entries) {
     Updates the text of the message.
 */
 function updateMessageText (id, messageText) {
-    var args = getEnviron();
-    var json = {message: messageText};
-    return request.patch('https://backend.homeinfo.de/tenant2tenant/message/' + id, args, json);
+    const json = {message: messageText};
+    return request.patch('https://backend.homeinfo.de/tenant2tenant/message/' + id, json, getEnviron());
 }
 
 
 function updateStartDate (id, date) {
-    var args = getEnviron();
-    var json = {startDate: date};
-    return request.patch('https://backend.homeinfo.de/tenant2tenant/message/' + id, args, json);
+    const json = {startDate: date};
+    return request.patch('https://backend.homeinfo.de/tenant2tenant/message/' + id, json, getEnviron());
 }
 
 
@@ -163,9 +168,8 @@ function updateStartDate (id, date) {
     Updates the end date.
 */
 function updateEndDate (id, date) {
-    var args = getEnviron();
-    var json = {endDate: date};
-    return request.patch('https://backend.homeinfo.de/tenant2tenant/message/' + id, args, json);
+    const json = {endDate: date};
+    return request.patch('https://backend.homeinfo.de/tenant2tenant/message/' + id, json, getEnviron());
 }
 
 
@@ -173,15 +177,14 @@ function updateEndDate (id, date) {
     Lists the emails from the API in the input field.
 */
 function listEmails (emails) {
-    var emailsInput = $('#emails');
-    var emailAddresses = [];
+    const emailsInput = $('#emails');
+    const emailAddresses = [];
 
-    for (var email of emails) {
+    for (const email of emails) {
         emailAddresses.push(email.email);
     }
 
-    var emailsString = emailAddresses.join(', ');
-    emailsInput.val(emailsString);
+    emailsInput.val(emailAddresses.join(', '));
 }
 
 
@@ -201,8 +204,7 @@ function setSettings (settings) {
     Loads the configured email addresses from the API.
 */
 function loadEmails () {
-    var args = getEnviron();
-    return request.get('https://backend.homeinfo.de/tenant2tenant/email', args).then(listEmails);
+    return request.get('https://backend.homeinfo.de/tenant2tenant/email', getEnviron()).then(listEmails);
 }
 
 
@@ -210,26 +212,26 @@ function loadEmails () {
     Returns a list of emails from the email input field.
 */
 function getEmails () {
-    var emailsInput = $('#emails');
-    var emailsString = emailsInput.val();
-    var emailAddresses = emailsString.split(',');
-    var emails = [];
+    const emailsInput = $('#emails');
+    const emailsString = emailsInput.val();
+    const emailAddresses = emailsString.split(',');
+    const emails = [];
 
-    for (var emailAddress of emailAddresses) {
-        var trimmedEmailAddress = emailAddress.trim();
+    for (const emailAddress of emailAddresses) {
+        const trimmedEmailAddress = emailAddress.trim();
 
         if (trimmedEmailAddress != '') {
-            var email = {email: trimmedEmailAddress, 'html':true};
-            emails.push(email);
+            emails.push({email: trimmedEmailAddress, 'html':true};);
         }
     }
+
     return emails;
 }
 
 
 function saveSettings () {
 	$('#pageloader').show();
-	var promises = [];
+	const promises = [];
 	promises.push(saveEmails());
 	promises.push(saveAutoRelease());
 	Promise.all(promises).then(
@@ -248,11 +250,8 @@ function saveSettings () {
     Saves the set emails.
 */
 function saveEmails () {
-    var args = getEnviron();
-    var emails = getEmails();
-    var promise = request.post('https://backend.homeinfo.de/tenant2tenant/email', args, emails);
-    return promise.then(loadEmails).then(
-        function () { },
+    return request.post('https://backend.homeinfo.de/tenant2tenant/email', getEmails(), getEnviron()).then(
+        loadEmails,
         function (error) {
             console.log('Error: ' + JSON.stringify(error));
             $('#pageloader').hide();
@@ -278,10 +277,11 @@ function loadAutoRelease () {
     Saves the autorelease settings.
 */
 function saveAutoRelease () {
-    var args = getEnviron();
-	var autorelease = $('input[name=autorelease]:checked').val() === 'true';
-	var relaseSec = parseInt($('#time').val())*86400;
-    return request.post('https://backend.homeinfo.de/tenant2tenant/configuration', args, {"autoRelease":autorelease, "releaseSec":relaseSec});
+	const json = {
+	    'autoRelease': $('input[name=autorelease]:checked').val() === 'true',
+	    'releaseSec': parseInt($('#time').val()) * 86400
+    };
+    return request.post('https://backend.homeinfo.de/tenant2tenant/configuration', json, getEnviron());
 }
 
 
@@ -299,11 +299,8 @@ export function init () {
 		$('#emails').attr('title', 'Das Ändern der E-Mails ist nicht erlaubt. Bitte kontaktieren Sie uns, damit wir dieses Modul für Sie freischalten können.');
 	}
     $('.btn_save').click(saveSettings);
-    var args = getEnviron();
-    var promiseListMessages = request.get('https://backend.homeinfo.de/tenant2tenant/message', args).then(list);
-    var promiseLoadEmails = loadEmails();
-	var promiseLoadAutoRelease = loadAutoRelease();
-    return Promise.all([promiseLoadEmails, promiseListMessages, promiseLoadAutoRelease]).then(
+    const promiseListMessages = request.get('https://backend.homeinfo.de/tenant2tenant/message', getEnviron()).then(list);
+    return Promise.all([loadEmails(), promiseListMessages, loadAutoRelease()]).then(
         function () {
             $('#pageloader').hide();
         }

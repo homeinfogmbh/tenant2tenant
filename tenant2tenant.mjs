@@ -81,7 +81,7 @@ function toggle (ident, startDate, endDate) {
 /*
     Deletes the entry with the respective ID.
 */
-function delete (ident) {
+function delete_ (ident) {
     request.delete('https://backend.homeinfo.de/tenant2tenant/message/' + ident, getEnviron()).then(init);
 }
 
@@ -118,7 +118,7 @@ function list (entries) {
 	});
 	$('.delete').click(function() {
 		$('#pageloader').show();
-		delete($(this).data('id'));
+		delete_($(this).data('id'));
 	});
 	$('.dateFrom').datepicker({
 		constrainInput: true,

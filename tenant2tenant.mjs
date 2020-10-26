@@ -177,11 +177,11 @@ function updateEndDate (id, date) {
 /*
     Lists the emails from the API in the input field.
 */
-function listEmails (emails) {
+function listEmails (response) {
     const emailsInput = $('#emails');
     const emailAddresses = [];
 
-    for (const email of emails) {
+    for (const email of response.json) {
         emailAddresses.push(email.email);
     }
 

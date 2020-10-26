@@ -7,7 +7,7 @@
 */
 'use strict';
 
-import { request } from 'https://javascript.homeinfo.de/his/his.js';
+import { request } from 'https://javascript.homeinfo.de/his/his.mjs';
 
 
 /*

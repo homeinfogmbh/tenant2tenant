@@ -1,5 +1,5 @@
 /*
-    Tenant-to-tenant java script library.
+    Tenant-to-tenant java script module.
 
     (C) 2018-2020 HOMEINFO - Digitale Informationssysteme GmbH
 
@@ -15,7 +15,11 @@ import { request } from 'https://javascript.homeinfo.de/his/his.mjs';
     Returns an error message.
 */
 function error (string) {
-    return '<font size="4" color="#FF0000">' + string + '</font>';
+    const font = document.createElement('font');
+    font.setAttribute('size', '4');
+    font.setAttribute('color', '#FF0000');
+    font.innerHTML = string;
+    return font.outerHTML;
 }
 
 
@@ -41,14 +45,43 @@ function listElement (record, i) {
 	const oneweek = new Date(record.created);
 	oneweek.setDate(oneweek.getDate() + 7);
 	const  enddatestring = oneweek.getFullYear() + "-" + ("0"+(oneweek.getMonth()+1)).slice(-2) + '-' + ("0"+oneweek.getDate()).slice(-2);
+
 	const row = document.createElement('tr');
 	row.classList.add(record.released ? 'success' :'danger');
+
 	const colId = document.createElement('td');
 	colId.textContent = '' + (i + 1);
 	row.appendChild(colId);
+
 	const colCreated = document.createElement('td');
 	colCreated.textContent = record.created.split('T').join(' ');
     row.appendChild(colCreated);
+
+    const coladdress = document.createElement('td');
+    colAddress.textContent = record.address.street + ' ' + record.address.houseNumber;
+    row.appendChild(colAddress);
+
+    const colMessage = document.createElement('td');
+    const divText = document.createElement('div');
+    divText.setAttribute('id', 'textValue');
+    divText.setAttribute('title', 'Text bearbeiten');
+    divText.setAttribute('contenteditable', 'true');
+    divText.style.backgroundColor = '#fff';
+    colMessage.appendChild(divText);
+    const btnSave = document.createElement('i');
+    btnSave.classList.add('fa');
+    btnSave.classList.add('fa-save');
+    btnSave.classList.add('btn_save_text');
+    btnSave.classList.add('pointer');
+    btnSave.setAttribute('title', 'Text speichern');
+    btnSave.setAttribute('data-id', '' + record.id);
+    btnSave.style.color = '#a2a2a2';
+    btnSave.style.fontSize = '20px';
+    btnSave.style.paddingTop = '5px';
+    colMessage.appendChild(btnSave);
+    row.appendChild(colMessage);
+
+    // TODO: Migrate HTML text generation to DOM operations.
 
     return '<tr class="' + (record.released ?'success' :'danger') + '">' +
         '<td>' + (i+1) + "</td>" +

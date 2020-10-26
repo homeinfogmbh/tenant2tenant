@@ -89,9 +89,8 @@ function delete_ (ident) {
 /*
     Lists the entries for the respective customer.
 */
-function list (entries) {
-    console.log('ENTRIES: ' + entries);
-    console.log('ENTRIES JSON: ' + JSON.stringify(entries));
+function list (response) {
+    const entries = response.json;
 	entries.sort(function(b, a) {
 		return compareStrings(a.created, b.created);
 	});

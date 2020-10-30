@@ -43,7 +43,9 @@ function listElement (record, i) {
 	const messageDOM = parser.parseFromString(record.message, 'text/html');
 	const oneweek = new Date(record.created);
 	oneweek.setDate(oneweek.getDate() + 7);
-	const  enddatestring = oneweek.getFullYear() + '-' + ('0' + (oneweek.getMonth() + 1)).slice(-2) + '-' + ('0' + oneweek.getDate()).slice(-2);
+	const month = ('0' + (oneweek.getMonth() + 1)).slice(-2);
+	const day = ('0' + oneweek.getDate()).slice(-2);
+	const  enddatestring = oneweek.getFullYear() + '-' + month + '-' + day;
 
 	const row = document.createElement('tr');
 	row.classList.add(record.released ? 'success' : 'danger');

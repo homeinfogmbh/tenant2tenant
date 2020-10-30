@@ -45,7 +45,7 @@ function listElement (record, i) {
 	oneweek.setDate(oneweek.getDate() + 7);
 	const month = ('0' + (oneweek.getMonth() + 1)).slice(-2);
 	const day = ('0' + oneweek.getDate()).slice(-2);
-	const  enddatestring = oneweek.getFullYear() + '-' + month + '-' + day;
+	const enddatestring = oneweek.getFullYear() + '-' + month + '-' + day;
 
 	const row = document.createElement('tr');
 	row.classList.add(record.released ? 'success' : 'danger');

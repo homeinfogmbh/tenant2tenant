@@ -12,6 +12,19 @@ import { request } from 'https://javascript.homeinfo.de/his/his.mjs';
 import { enumerate } from 'https://javascript.homeinfo.de/lib.mjs';
 
 
+function getDatepicketConfig () {
+	return  {
+	    constrainInput: true,
+	    monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
+	    monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun', 'Jul','Aug','Sep','Okt','Nov','Dez'],
+	    dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+	    dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+	    dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+	    dateFormat : 'yy-mm-dd'
+    };
+}
+
+
 /*
     Returns an error message.
 */
@@ -214,10 +227,12 @@ function list (response) {
 		$('#pageloader').show();
 		updateMessageText($(this).data('id'), $(this).parent().find('#textvalue').html()).then(function(){$('#pageloader').hide();});
 	});
+
 	$('.toggle').click(function() {
 		$('#pageloader').show();
 		toggle($(this).data('id'), $(this).parent().parent().find('.dateFrom').val(), $(this).parent().parent().find('.dateUntil').val());
 	});
+
 	$('.confirmdelete').click(function(e) {
 		if ($(this).text() === 'nein') {
 			$(this).parent().hide('fast');
@@ -229,35 +244,25 @@ function list (response) {
 		}
 		e.preventDefault();
 	});
+
 	$('.delete').click(function() {
 		$('#pageloader').show();
 		delete_($(this).data('id'));
 	});
-	$('.dateFrom').datepicker({
-		constrainInput: true,
-		monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
-		monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun', 'Jul','Aug','Sep','Okt','Nov','Dez'],
-		dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-		dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-		dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-		dateFormat : 'yy-mm-dd',
-		onClose: function (date) {
-			updateStartDate($(this).data('id'), date);
-		}
-	}, $.datepicker.regional['de']);
-	$('.dateUntil').datepicker({
-		constrainInput: true,
-		monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
-		monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun', 'Jul','Aug','Sep','Okt','Nov','Dez'],
-		dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-		dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-		dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-		dateFormat : 'yy-mm-dd',
-		firstDay: 1,
-		onClose: function (date) {
-			updateEndDate($(this).data('id'), date);
-		}
-    }, $.datepicker.regional['de']);
+
+	const configFrom = getDatepicketConfig();
+	configFrom.onClose = function (date) {
+		updateStartDate($(this).data('id'), date);
+	};
+	$('.dateFrom').datepicker(configFrom, $.datepicker.regional['de']);
+
+	const configUntil = getDatepicketConfig();
+	configUntil.firstDay = 1;
+	configUntil.onClose: function (date) {
+		updateEndDate($(this).data('id'), date);
+	};
+	$('.dateUntil').datepicker(configUntil, $.datepicker.regional['de']);
+
     $('#pageloader').hide();
 }
 

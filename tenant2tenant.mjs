@@ -112,7 +112,7 @@ function listElement (record, i) {
     row.appendChild(colUntil);
 
     const colReleased = document.createElement('td');
-    colReleased.stype.verticalAlign = 'middle';
+    colReleased.style.verticalAlign = 'middle';
     const title = record.released ? 'Eintrag sperren" checked' : 'Eintrag freigeben"';
     const inputReleased = document.createElement('input');
     inputReleased.classList.add('toggle');

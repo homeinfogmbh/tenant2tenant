@@ -138,7 +138,7 @@ function listElement (record, i) {
     const fontDelete = document.createElement('font');
     fontDelete.classList.add('confirm');
     fontDelete.classList.add('deleteconfirm');
-    fontDelete.style.diplay = 'none';
+    fontDelete.style.display = 'none';
     fontDelete.style.float = 'right';
     fontDelete.appendChild(document.createTextNode('Sicher?'))
     fontDelete.appendChild(document.createElement('br'));

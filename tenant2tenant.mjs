@@ -162,22 +162,6 @@ function listElement (record, i) {
     colDelete.appendChild(fontDelete);
     row.appendChild(colDelete);
     return row;
-
-
-    /* TODO: Migrate HTML text generation to DOM operations.
-
-    return '<tr class="' + (record.released ?'success' :'danger') + '">' +
-        '<td>' + (i+1) + "</td>" +
-        '<td>' + record.created.split('T').join(' ') + '</td>' +
-        '<td>' + record.address.street + ' ' + record.address.houseNumber + '</td>' +
-        '<td><div title="Text bearbeiten" id="textvalue" contenteditable="true" style="background-color:#fff">' + messageDOM.body.textContent + ' </div><i class="fa fa-save btn_save_text pointer" style="font-size:20px; color:#a2a2a2; padding-top:5px" title="Text speichern" data-id="' + record.id + '"></i></td>' +
-        '<td width="130px"><input type="text" class="form-control datetime dateFrom" data-id="' + record.id + '" placeholder="Anzeigen von" value="' + (record.startDate != null ?record.startDate :record.created.substr(0, 10)) + '"></td>' +
-        '<td width="130px"><input type="text" class="form-control datetime dateUntil" data-id="' + record.id + '" placeholder="Anzeigen bis" value="' + (record.endDate != null ?record.endDate :enddatestring) + '"></td>' +
-        '<td style="vertical-align: middle"><input type="checkbox" class="toggle" data-id="' + record.id + '" title="' + (record.released ?'Eintrag sperren" checked' :'Eintrag freigeben"') + '></td>' +
-        '<td style="vertical-align: middle"><i class="fa fa-trash-o confirmdelete pointer" style="font-size:20px; color:#a2a2a2; padding-left:5px" title="Eintrag löschen"><br>' +
-        '<font class="confirm deleteconfirm" style="display:none; float:right;"> Sicher?<br><a href="#" class="delete no_drag deleteconfirm" data-id="' + record.id + '">ja</a> / <a href="#" class="confirmdelete no_drag deleteconfirm" >nein</a></font></td>' +
-        '</tr>';
-    */
 }
 
 

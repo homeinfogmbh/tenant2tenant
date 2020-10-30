@@ -8,7 +8,7 @@
 'use strict';
 
 
-import { request } from 'https://javascript.homeinfo.de/his/his.mjs';
+import { request, getUser } from 'https://javascript.homeinfo.de/his/his.mjs';
 import { enumerate } from 'https://javascript.homeinfo.de/lib.mjs';
 
 
@@ -411,7 +411,9 @@ function saveAutoRelease () {
 */
 export function init () {
     $('#pageloader').show();
-	if (localStorage.getItem("user") && (JSON.parse(localStorage.getItem("user")).admin || JSON.parse(localStorage.getItem("user")).root)) {
+    const user = getUser('user');
+
+	if (user != null && (user.admin || user.root)) {
 		$('#emails').removeAttr('disabled');
 		$('.btn_save').removeAttr('disabled');
 	} else {

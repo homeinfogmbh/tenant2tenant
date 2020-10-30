@@ -68,7 +68,7 @@ function listElement (record, i) {
     divText.setAttribute('title', 'Text bearbeiten');
     divText.setAttribute('contenteditable', 'true');
     divText.style.backgroundColor = '#fff';
-    divText.textContent = messageDOM.body.textContent;
+    divText.innerHTML = messageDOM.body.textContent;
     colMessage.appendChild(divText);
     const btnSave = document.createElement('i');
     btnSave.classList.add('fa');

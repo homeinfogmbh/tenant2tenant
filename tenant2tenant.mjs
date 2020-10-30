@@ -142,8 +142,9 @@ function listElement (record, i) {
 
     const colReleased = document.createElement('td');
     colReleased.style.verticalAlign = 'middle';
-    const title = record.released ? 'Eintrag sperren" checked' : 'Eintrag freigeben"';
+    const title = record.released ? 'Eintrag sperren' : 'Eintrag freigeben';
     const inputReleased = document.createElement('input');
+    inputReleased.checked = record.released;
     inputReleased.classList.add('toggle');
     inputReleased.setAttribute('type', 'checkbox');
     inputReleased.setAttribute('data-id', '' + record.id);

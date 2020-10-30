@@ -258,7 +258,7 @@ function list (response) {
 
 	const configUntil = getDatepicketConfig();
 	configUntil.firstDay = 1;
-	configUntil.onClose: function (date) {
+	configUntil.onClose = function (date) {
 		updateEndDate($(this).data('id'), date);
 	};
 	$('.dateUntil').datepicker(configUntil, $.datepicker.regional['de']);

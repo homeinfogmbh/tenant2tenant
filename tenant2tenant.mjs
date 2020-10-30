@@ -132,7 +132,7 @@ function listElement (record, i) {
     iDelete.setAttribute('title', 'Eintrag löschen');
     iDelete.style.fontSize = '20px';
     iDelete.style.color = '#a2a2a2';
-    iDelete.style.color.paddingLeft = '5px';
+    iDelete.style.paddingLeft = '5px';
     colDelete.appendChild(iDelete);
     colDelete.appendChild(document.createElement('br'));
     const fontDelete = document.createElement('font');

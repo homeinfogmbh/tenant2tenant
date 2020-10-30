@@ -58,7 +58,7 @@ function listElement (record, i) {
 	colCreated.textContent = record.created.split('T').join(' ');
     row.appendChild(colCreated);
 
-    const coladdress = document.createElement('td');
+    const colAddress = document.createElement('td');
     colAddress.textContent = record.address.street + ' ' + record.address.houseNumber;
     row.appendChild(colAddress);
 

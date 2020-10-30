@@ -31,9 +31,7 @@ function getEnviron () {
 	if (localStorage.getItem('customer') === '')
 		return {};
 
-    return {
-        'customer': localStorage.getItem("customerid"),
-    };
+    return {'customer': localStorage.getItem("customerid")};
 }
 
 

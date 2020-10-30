@@ -9,6 +9,7 @@
 
 
 import { request } from 'https://javascript.homeinfo.de/his/his.mjs';
+import { enumerate } from 'https://javascript.homeinfo.de/lib.mjs';
 
 
 /*
@@ -44,10 +45,10 @@ function listElement (record, i) {
 	const messageDOM = parser.parseFromString(record.message, 'text/html');
 	const oneweek = new Date(record.created);
 	oneweek.setDate(oneweek.getDate() + 7);
-	const  enddatestring = oneweek.getFullYear() + "-" + ("0"+(oneweek.getMonth()+1)).slice(-2) + '-' + ("0"+oneweek.getDate()).slice(-2);
+	const  enddatestring = oneweek.getFullYear() + '-' + ('0' + (oneweek.getMonth() + 1)).slice(-2) + '-' + ('0' + oneweek.getDate()).slice(-2);
 
 	const row = document.createElement('tr');
-	row.classList.add(record.released ? 'success' :'danger');
+	row.classList.add(record.released ? 'success' : 'danger');
 
 	const colId = document.createElement('td');
 	colId.textContent = '' + (i + 1);
@@ -67,6 +68,7 @@ function listElement (record, i) {
     divText.setAttribute('title', 'Text bearbeiten');
     divText.setAttribute('contenteditable', 'true');
     divText.style.backgroundColor = '#fff';
+    divText.textContent = messageDOM.body.textContent;
     colMessage.appendChild(divText);
     const btnSave = document.createElement('i');
     btnSave.classList.add('fa');
@@ -81,7 +83,88 @@ function listElement (record, i) {
     colMessage.appendChild(btnSave);
     row.appendChild(colMessage);
 
-    // TODO: Migrate HTML text generation to DOM operations.
+    const colFrom = document.createElement('td');
+    colFrom.setAttribute('width', '130px');
+    const from = record.startDate != null ? record.startDate : record.created.substr(0, 10);
+    const inputFrom = document.createElement('input');
+    inputFrom.classList.add('form-control');
+    inputFrom.classList.add('datetime');
+    inputFrom.classList.add('dateFrom');
+    inputFrom.setAttribute('type', 'text');
+    inputFrom.setAttribute('data-id', '' + record.id);
+    inputFrom.setAttribute('placeholder', 'Anzeigen von');
+    inputFrom.setAttribute('value', from);
+    colFrom.appendChild(inputFrom);
+    row.appendChild(colFrom);
+
+    const colUntil = document.createElement('td');
+    colUntil.setAttribute('width', '130px');
+    const until = record.endDate != null ? record.endDate : enddatestring;
+    const inputUntil = document.createElement('input');
+    inputUntil.classList.add('form-control');
+    inputUntil.classList.add('datetime');
+    inputUntil.classList.add('dateUntil');
+    inputUntil.setAttribute('type', 'text');
+    inputUntil.setAttribute('data-id', '' + record.id);
+    inputUntil.setAttribute('placeholder', 'Anzeigen bis');
+    inputUntil.setAttribute('value', until);
+    colUntil.appendChild(inputUntil);
+    row.appendChild(colUntil);
+
+    const colReleased = document.createElement('td');
+    colReleased.stype.verticalAlign = 'middle';
+    const title = record.released ? 'Eintrag sperren" checked' : 'Eintrag freigeben"';
+    const inputReleased = document.createElement('input');
+    inputReleased.classList.add('toggle');
+    inputReleased.setAttribute('type', 'checkbox');
+    inputReleased.setAttribute('data-id', '' + record.id);
+    inputReleased.setAttribute('title', title);
+    colReleased.appendChild(inputReleased);
+    row.appendChild(colReleased);
+
+    const colDelete = document.createElement('td');
+    colDelete.style.verticalAlign = 'middle';
+    const iDelete = document.createElement('i');
+    iDelete.classList.add('fa');
+    iDelete.classList.add('fa-trash-o');
+    iDelete.classList.add('confirmdelete');
+    iDelete.classList.add('pointer');
+    iDelete.setAttribute('title', 'Eintrag löschen');
+    iDelete.style.fontSize = '20px';
+    iDelete.style.color = '#a2a2a2';
+    iDelete.style.color.paddingLeft = '5px';
+    colDelete.appendChild(iDelete);
+    colDelete.appendChild(document.createElement('br'));
+    const fontDelete = document.createElement('font');
+    fontDelete.classList.add('confirm');
+    fontDelete.classList.add('deleteconfirm');
+    fontDelete.style.diplay = 'none';
+    fontDelete.style.float = 'right';
+    fontDelete.appendChild(document.createTextNode('Sicher?'))
+    fontDelete.appendChild(document.createElement('br'));
+    const aConfirmDelete = document.createElement('a');
+    aConfirmDelete.classList.add('delete');
+    aConfirmDelete.classList.add('no_drag');
+    aConfirmDelete.classList.add('deleteconfirm');
+    aConfirmDelete.setAttribute('href', '#');
+    aConfirmDelete.setAttribute('data-id', '' + record.id);
+    aConfirmDelete.textContent = 'ja';
+    fontDelete.appendChild(aConfirmDelete);
+    fontDelete.appendChild(document.createTextNode(' / '));
+    const aCancelDelete = document.createElement('a')
+    aCancelDelete.classList.add('confirmdelete');
+    aCancelDelete.classList.add('no_drag');
+    aCancelDelete.classList.add('deleteconfirm');
+    aCancelDelete.setAttribute('href', '#');
+    aCancelDelete.setAttribute('data-id', '' + record.id);
+    aCancelDelete.textContent = 'nein';
+    fontDelete.appendChild(aCancelDelete);
+    colDelete.appendChild(fontDelete);
+    row.appendChild(colDelete);
+    return row;
+
+
+    /* TODO: Migrate HTML text generation to DOM operations.
 
     return '<tr class="' + (record.released ?'success' :'danger') + '">' +
         '<td>' + (i+1) + "</td>" +
@@ -94,6 +177,7 @@ function listElement (record, i) {
         '<td style="vertical-align: middle"><i class="fa fa-trash-o confirmdelete pointer" style="font-size:20px; color:#a2a2a2; padding-left:5px" title="Eintrag löschen"><br>' +
         '<font class="confirm deleteconfirm" style="display:none; float:right;"> Sicher?<br><a href="#" class="delete no_drag deleteconfirm" data-id="' + record.id + '">ja</a> / <a href="#" class="confirmdelete no_drag deleteconfirm" >nein</a></font></td>' +
         '</tr>';
+    */
 }
 
 
@@ -125,13 +209,23 @@ function delete_ (ident) {
 */
 function list (response) {
     const entries = response.json;
+
 	entries.sort(function(b, a) {
 		return compareStrings(a.created, b.created);
 	});
-    let elements = 'Es wurden keine Nachrichten geschrieben.';
-    for (let i = 0; i < entries.length; i++)
-        elements += listElement(entries[i], i);
-	$('#messages').html(elements);
+
+    const rows = [];
+    let index, entry;
+
+    for (const [index, entry] of enumerate(entries))
+        rows.push(listElement(entry, index));
+
+    if (rows.length == 0)
+        rows.append(document.createTextNode('Es wurden keine Nachrichten geschrieben.'));
+
+    for (const row of rows)
+	    $('#messages').append(row);
+
 	$('.btn_save_text').click(function() {
 		$('#pageloader').show();
 		updateMessageText($(this).data('id'), $(this).parent().find('#textvalue').html()).then(function(){$('#pageloader').hide();});

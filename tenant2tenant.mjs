@@ -12,6 +12,9 @@ import { request } from 'https://javascript.homeinfo.de/his/his.mjs';
 import { enumerate } from 'https://javascript.homeinfo.de/lib.mjs';
 
 
+/*
+    Returns common configuration for the datepicker tool.
+*/
 function getDatepicketConfig () {
 	return  {
 	    constrainInput: true,

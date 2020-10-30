@@ -279,6 +279,9 @@ function updateMessageText (id, messageText) {
 }
 
 
+/*
+    Updates the start date.
+*/
 function updateStartDate (id, date) {
     const json = {startDate: date};
     return request.patch('https://backend.homeinfo.de/tenant2tenant/message/' + id, json, getEnviron());

@@ -7,9 +7,10 @@ from peewee import BooleanField
 from peewee import DateField
 from peewee import DateTimeField
 from peewee import ForeignKeyField
+from peewee import ModelSelect
 from peewee import TextField
 
-from mdb import Address, Customer
+from mdb import Address, Company, Customer
 from notificationlib import get_email_orm_model
 from peeweeplus import EnumField, JSONModel, MySQLDatabase
 
@@ -41,12 +42,22 @@ class Configuration(_Tenant2TenantModel):
     release_sec = BigIntegerField(default=432000)
 
     @classmethod
+    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+        """Selects configurations."""
+        if not cascade:
+            return super().select(*args, **kwargs)
+
+        args = {cls, Customer, Company, *args}
+        return super().select(*args, **kwargs).join(Customer).join(Company)
+
+    @classmethod
     def for_customer(cls, customer):
         """Returns the configuration for the respective customer."""
         try:
-            return cls.get(cls.customer == customer)
+            return cls.select(cascade=True).where(
+                cls.customer == customer).get()
         except cls.DoesNotExist:
-            return cls()
+            return cls(customer=customer)
 
     @property
     def release_time(self):
@@ -94,7 +105,17 @@ class TenantMessage(_Tenant2TenantModel):
         today = date.today()
         condition &= (cls.start_date >> None) | (cls.start_date <= today)
         condition &= (cls.end_date >> None) | (cls.end_date >= today)
-        return cls.select().where(condition)
+        return cls.select(cascade=True).where(condition)
+
+    @classmethod
+    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+        """Selects configurations."""
+        if not cascade:
+            return super().select(*args, **kwargs)
+
+        args = {cls, Customer, Company, Address, *args}
+        return super().select(*args, **kwargs).join(
+            Customer).join(Company).join_from(cls, Address)
 
     @property
     def active(self):

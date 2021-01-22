@@ -22,7 +22,7 @@ setup(
         'peewee',
         'peeweeplus',
         'previewlib',
-        'wsgilib',
+        'wsgilib'
     ],
     author='HOMEINFO - Digitale Informationssysteme GmbH',
     author_email='<info@homeinfo.de>',

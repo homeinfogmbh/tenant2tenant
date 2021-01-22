@@ -13,12 +13,6 @@ from previewlib import preview, DeploymentPreviewToken
 from wsgilib import JSON, JSONMessage, XML
 
 from tenant2tenant.dom import tenant2tenant
-from tenant2tenant.messages import MESSAGE_TOGGLED
-from tenant2tenant.messages import MESSAGE_PATCHED
-from tenant2tenant.messages import MESSAGE_DELETED
-from tenant2tenant.messages import NO_SUCH_MESSAGE
-from tenant2tenant.messages import NO_SUCH_CONFIGURATION
-from tenant2tenant.messages import CONFIGURATION_SET
 from tenant2tenant.orm import Configuration, TenantMessage, NotificationEmail
 
 
@@ -63,15 +57,13 @@ def _get_released() -> Union[bool, None]:
 def _get_message(ident: int) -> TenantMessage:
     """Returns the respective message."""
 
-    try:
-        return TenantMessage.select(cascade=True).where(
-            (TenantMessage.id == ident)
-            & (TenantMessage.customer == CUSTOMER.id)
-        ).get()
-    except TenantMessage.DoesNotExist:
-        raise NO_SUCH_MESSAGE
+    return TenantMessage.select(cascade=True).where(
+        (TenantMessage.id == ident)
+        & (TenantMessage.customer == CUSTOMER.id)
+    ).get()
 
 
+@APPLICATION.route('/message', methods=['GET'], strict_slashes=False)
 @authenticated
 @authorized('tenant2tenant')
 def list_messages() -> JSON:
@@ -81,6 +73,8 @@ def list_messages() -> JSON:
         CUSTOMER.id, _get_released())])
 
 
+@APPLICATION.route('/message/<int:ident>', methods=['GET'],
+                   strict_slashes=False)
 @authenticated
 @authorized('tenant2tenant')
 def get_message(ident: int) -> JSON:
@@ -89,6 +83,8 @@ def get_message(ident: int) -> JSON:
     return JSON(_get_message(ident).to_json())
 
 
+@APPLICATION.route('/message/<int:ident>', methods=['PUT'],
+                   strict_slashes=False)
 @authenticated
 @authorized('tenant2tenant')
 def toggle_message(ident: int) -> JSONMessage:
@@ -97,9 +93,12 @@ def toggle_message(ident: int) -> JSONMessage:
     message = _get_message(ident)
     message.released = not message.released
     message.save()
-    return MESSAGE_TOGGLED.update(released=message.released)
+    return JSONMessage('The message has been toggled.',
+                       released=message.released, status=200)
 
 
+@APPLICATION.route('/message/<int:ident>', methods=['PATCH'],
+                   strict_slashes=False)
 @authenticated
 @authorized('tenant2tenant')
 def patch_message(ident: int) -> JSONMessage:
@@ -108,9 +107,11 @@ def patch_message(ident: int) -> JSONMessage:
     message = _get_message(ident)
     message.patch_json(request.json, skip=SKIPPED_PATCH_FIELDS)
     message.save()
-    return MESSAGE_PATCHED
+    return JSONMessage('The message has been updated.', status=200)
 
 
+@APPLICATION.route('/message/<int:ident>', methods=['DELETE'],
+                   strict_slashes=False)
 @authenticated
 @authorized('tenant2tenant')
 def delete_message(ident: int) -> JSONMessage:
@@ -118,22 +119,21 @@ def delete_message(ident: int) -> JSONMessage:
 
     message = _get_message(ident)
     message.delete_instance()
-    return MESSAGE_DELETED
+    return JSONMessage('The message has been deleted.', status=200)
 
 
+@APPLICATION.route('/configuration', methods=['GET'], strict_slashes=False)
 @authenticated
 @authorized('tenant2tenant')
 def get_config() -> Union[JSON, JSONMessage]:
     """Returns the configuration of the respective customer."""
-    try:
-        configuration = Configuration.select(cascade=True).where(
-            Configuration.customer == CUSTOMER.id).get()
-    except Configuration.DoesNotExist:
-        return NO_SUCH_CONFIGURATION
 
+    configuration = Configuration.select(cascade=True).where(
+        Configuration.customer == CUSTOMER.id).get()
     return JSON(configuration.to_json())
 
 
+@APPLICATION.route('/configuration', methods=['POST'], strict_slashes=False)
 @authenticated
 @authorized('tenant2tenant')
 def set_config() -> JSONMessage:
@@ -149,12 +149,13 @@ def set_config() -> JSONMessage:
         configuration.patch_json(request.json)
         configuration.save()
 
-    return CONFIGURATION_SET
+    return JSONMessage('Configuration set.', sltatus=200)
 
 
 GET_EMAILS, SET_EMAILS = get_wsgi_funcs('tenant2tenant', NotificationEmail)
 
 
+@APPLICATION.route('/preview', methods=['GET'], strict_slashes=False)
 @preview(DeploymentPreviewToken)
 def preview_deployment(deployment: Union[Deployment, int]) -> XML:
     """Returns a preview of the respective tenant-to-tenant messages."""
@@ -168,14 +169,21 @@ def preview_deployment(deployment: Union[Deployment, int]) -> XML:
 
 
 APPLICATION.add_routes((
-    ('GET', '/message', list_messages),
-    ('GET', '/message/<int:ident>', get_message),
-    ('PUT', '/message/<int:ident>', toggle_message),
-    ('PATCH', '/message/<int:ident>', patch_message),
-    ('DELETE', '/message/<int:ident>', delete_message),
-    ('GET', '/configuration', get_config),
-    ('POST', '/configuration', set_config),
     ('GET', '/email', GET_EMAILS),
-    ('POST', '/email', SET_EMAILS),
-    ('GET', '/preview', preview_deployment)
+    ('POST', '/email', SET_EMAILS)
 ))
+
+
+@APPLICATION.errorhandler(Configuration.DoesNotExist)
+def handle_missing_configuration(_: Configuration.DoesNotExist) -> JSONMessage:
+    """Handles missing configuration."""
+
+    return JSONMessage('The requested configuration does not exist.',
+                       status=404)
+
+
+@APPLICATION.errorhandler(TenantMessage.DoesNotExist)
+def handle_missing_message(_: TenantMessage.DoesNotExist) -> JSONMessage:
+    """Handles missing tenant messages."""
+
+    return JSONMessage('The requested message does not exist.', status=404)

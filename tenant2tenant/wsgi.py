@@ -35,7 +35,7 @@ def _get_messages(customer, released):
     if released is not None:
         expression &= TenantMessage.released == int(released)
 
-    return TenantMessage.select().where(expression)
+    return TenantMessage.select(cascade=True).where(expression)
 
 
 def _get_released():
@@ -58,9 +58,10 @@ def _get_message(ident):
     """Returns the respective message."""
 
     try:
-        return TenantMessage.get(
+        return TenantMessage.select(cascade=True).where(
             (TenantMessage.id == ident)
-            & (TenantMessage.customer == CUSTOMER.id))
+            & (TenantMessage.customer == CUSTOMER.id)
+        ).get()
     except TenantMessage.DoesNotExist:
         raise NO_SUCH_MESSAGE
 
@@ -119,8 +120,8 @@ def delete_message(ident):
 def get_config():
     """Returns the configuration of the respective customer."""
     try:
-        configuration = Configuration.get(
-            Configuration.customer == CUSTOMER.id)
+        configuration = Configuration.select(cascade=True).where(
+            Configuration.customer == CUSTOMER.id).get()
     except Configuration.DoesNotExist:
         return NO_SUCH_CONFIGURATION
 
@@ -132,8 +133,8 @@ def get_config():
 def set_config():
     """Sets the configuration for the respective customer."""
     try:
-        configuration = Configuration.get(
-            Configuration.customer == CUSTOMER.id)
+        configuration = Configuration.select(cascade=True).where(
+            Configuration.customer == CUSTOMER.id).get()
     except Configuration.DoesNotExist:
         configuration = Configuration.from_json(request.json)
         configuration.customer = CUSTOMER.id

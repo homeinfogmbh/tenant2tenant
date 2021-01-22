@@ -1,11 +1,16 @@
 """Authenticated and authorized HIS services."""
 
+from typing import Union
+
 from flask import request
+from peewee import ModelSelect
 
 from his import CUSTOMER, authenticated, authorized, Application
+from hwdb import Deployment
+from mdb import Customer
 from notificationlib import get_wsgi_funcs
 from previewlib import preview, DeploymentPreviewToken
-from wsgilib import JSON, XML
+from wsgilib import JSON, JSONMessage, XML
 
 from tenant2tenant.dom import tenant2tenant
 from tenant2tenant.messages import MESSAGE_TOGGLED
@@ -27,18 +32,19 @@ SKIPPED_PATCH_FIELDS = set(
     if key not in ALLOWED_PATCH_FIELDS)
 
 
-def _get_messages(customer, released):
+def _get_messages(customer: Union[Customer, int],
+                  released: Union[bool, None]) -> ModelSelect:
     """Yields the customer's tenant-to-tenant messages."""
 
     expression = TenantMessage.customer == customer
 
     if released is not None:
-        expression &= TenantMessage.released == int(released)
+        expression &= TenantMessage.released == released
 
     return TenantMessage.select(cascade=True).where(expression)
 
 
-def _get_released():
+def _get_released() -> Union[bool, None]:
     """Returns the released flag."""
 
     released = request.args.get('released')
@@ -54,7 +60,7 @@ def _get_released():
     return bool(released)
 
 
-def _get_message(ident):
+def _get_message(ident: int) -> TenantMessage:
     """Returns the respective message."""
 
     try:
@@ -68,7 +74,7 @@ def _get_message(ident):
 
 @authenticated
 @authorized('tenant2tenant')
-def list_messages():
+def list_messages() -> JSON:
     """Lists the tenant-to-tenant messages."""
 
     return JSON([message.to_json() for message in _get_messages(
@@ -77,7 +83,7 @@ def list_messages():
 
 @authenticated
 @authorized('tenant2tenant')
-def get_message(ident):
+def get_message(ident: int) -> JSON:
     """Returns the respective message of the customer."""
 
     return JSON(_get_message(ident).to_json())
@@ -85,7 +91,7 @@ def get_message(ident):
 
 @authenticated
 @authorized('tenant2tenant')
-def toggle_message(ident):
+def toggle_message(ident: int) -> JSONMessage:
     """Toggles the respective message."""
 
     message = _get_message(ident)
@@ -96,7 +102,7 @@ def toggle_message(ident):
 
 @authenticated
 @authorized('tenant2tenant')
-def patch_message(ident):
+def patch_message(ident: int) -> JSONMessage:
     """Toggles the respective message."""
 
     message = _get_message(ident)
@@ -107,7 +113,7 @@ def patch_message(ident):
 
 @authenticated
 @authorized('tenant2tenant')
-def delete_message(ident):
+def delete_message(ident: int) -> JSONMessage:
     """Deletes the respective message."""
 
     message = _get_message(ident)
@@ -117,7 +123,7 @@ def delete_message(ident):
 
 @authenticated
 @authorized('tenant2tenant')
-def get_config():
+def get_config() -> Union[JSON, JSONMessage]:
     """Returns the configuration of the respective customer."""
     try:
         configuration = Configuration.select(cascade=True).where(
@@ -130,7 +136,7 @@ def get_config():
 
 @authenticated
 @authorized('tenant2tenant')
-def set_config():
+def set_config() -> JSONMessage:
     """Sets the configuration for the respective customer."""
     try:
         configuration = Configuration.select(cascade=True).where(
@@ -150,7 +156,7 @@ GET_EMAILS, SET_EMAILS = get_wsgi_funcs('tenant2tenant', NotificationEmail)
 
 
 @preview(DeploymentPreviewToken)
-def preview_deployment(deployment):
+def preview_deployment(deployment: Union[Deployment, int]) -> XML:
     """Returns a preview of the respective tenant-to-tenant messages."""
 
     xml = tenant2tenant()

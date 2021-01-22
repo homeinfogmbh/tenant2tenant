@@ -1,6 +1,8 @@
 """Tenant-to-tenant messaging ORM models."""
 
+from __future__ import annotations
 from datetime import datetime, date, timedelta
+from typing import Union
 
 from peewee import BigIntegerField
 from peewee import BooleanField
@@ -10,6 +12,7 @@ from peewee import ForeignKeyField
 from peewee import ModelSelect
 from peewee import TextField
 
+from hwdb import Deployment
 from mdb import Address, Company, Customer
 from notificationlib import get_email_orm_model
 from peeweeplus import EnumField, JSONModel, MySQLDatabase
@@ -51,7 +54,7 @@ class Configuration(_Tenant2TenantModel):
         return super().select(*args, **kwargs).join(Customer).join(Company)
 
     @classmethod
-    def for_customer(cls, customer):
+    def for_customer(cls, customer: Union[Customer, int]) -> Configuration:
         """Returns the configuration for the respective customer."""
         try:
             return cls.select(cascade=True).where(
@@ -60,7 +63,7 @@ class Configuration(_Tenant2TenantModel):
             return cls(customer=customer)
 
     @property
-    def release_time(self):
+    def release_time(self) -> timedelta:
         """Returns a timedelta of the specified release time."""
         return timedelta(seconds=self.release_sec)
 
@@ -83,21 +86,22 @@ class TenantMessage(_Tenant2TenantModel):
     end_date = DateField(null=True, default=None)
 
     @classmethod
-    def add(cls, customer, address, message):
+    def add(cls, customer: Union[Customer, int], address: Union[Address, int],
+            message: str) -> TenantMessage:
         """Creates a new entry for the respective customer and address."""
-        record = cls()
-        record.customer = customer
-        record.address = address
-        record.message = message
+        record = cls(customer=customer, address=address, message=message)
+        record.save()
         return record
 
     @classmethod
-    def from_deployment(cls, deployment, message):
+    def from_deployment(cls, deployment: Union[Deployment, int],
+                        message: str) -> TenantMessage:
         """Creates a new entry for the respective deployment."""
         return cls.add(deployment.customer, deployment.address, message)
 
     @classmethod
-    def for_deployment(cls, deployment):
+    def for_deployment(cls, deployment: Union[Deployment, int]) \
+            -> TenantMessage:
         """Yields released, active records for the respective deployment."""
         condition = cls.customer == deployment.customer
         condition &= cls.address == deployment.address
@@ -118,14 +122,14 @@ class TenantMessage(_Tenant2TenantModel):
             Customer).join(Company).join_from(cls, Address)
 
     @property
-    def active(self):
+    def active(self) -> bool:
         """Determines whether the message is active."""
         today = date.today()
         match_start = self.start_date is None or self.start_date <= today
         match_end = self.end_date is None or self.end_date >= today
         return match_start and match_end
 
-    def to_json(self, address=True, **kwargs):
+    def to_json(self, address: bool = True, **kwargs) -> dict:
         """Adds the address to the dictionary."""
         json = super().to_json(**kwargs)
 
@@ -134,7 +138,7 @@ class TenantMessage(_Tenant2TenantModel):
 
         return json
 
-    def to_dom(self):
+    def to_dom(self) -> dom.TenantMessage:
         """Returns the tenant message as XML DOM."""
         xml = dom.TenantMessage(self.message)
         xml.created = self.created

@@ -1,5 +1,7 @@
 """Emailing of new tenant-to-tenant messages."""
 
+from typing import Iterator
+
 from emaillib import EMail
 from functoolsplus import coerce
 from notificationlib import get_email_func
@@ -12,7 +14,7 @@ __all__ = ['email']
 
 
 @coerce(frozenset)
-def get_emails(message):
+def get_emails(message: str) -> Iterator[EMail]:
     """Yields notification emails."""
 
     for notification_email in NotificationEmail.select().where(

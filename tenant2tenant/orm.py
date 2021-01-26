@@ -40,7 +40,7 @@ class Configuration(_Tenant2TenantModel):
     """Customer-specific configuration."""
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE')
+        Customer, column_name='customer', on_delete='CASCADE', lazy_load=False)
     auto_release = BooleanField(default=False)
     release_sec = BigIntegerField(default=432000)
 
@@ -74,8 +74,9 @@ class TenantMessage(_Tenant2TenantModel):
     class Meta:     # pylint: disable=C0111,R0903
         table_name = 'tenant_message'
 
-    customer = ForeignKeyField(Customer, column_name='customer')
-    address = ForeignKeyField(Address, column_name='address')
+    customer = ForeignKeyField(
+        Customer, column_name='customer', lazy_load=False)
+    address = ForeignKeyField(Address, column_name='address', lazy_load=False)
     subject = TextField(null=True)
     message = TextField()
     visibility = EnumField(Visibility, default=Visibility.TENEMENT)

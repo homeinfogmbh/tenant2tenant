@@ -10,12 +10,11 @@ from peewee import DateField
 from peewee import DateTimeField
 from peewee import ForeignKeyField
 from peewee import ModelSelect
-from peewee import TextField
 
 from hwdb import Deployment
 from mdb import Address, Company, Customer
 from notificationlib import get_email_orm_model
-from peeweeplus import EnumField, JSONModel, MySQLDatabase
+from peeweeplus import EnumField, HTMLTextField, JSONModel, MySQLDatabase
 
 from tenant2tenant import dom   # pylint: disable=E0611
 from tenant2tenant.config import CONFIG
@@ -77,8 +76,8 @@ class TenantMessage(_Tenant2TenantModel):
     customer = ForeignKeyField(
         Customer, column_name='customer', lazy_load=False)
     address = ForeignKeyField(Address, column_name='address', lazy_load=False)
-    subject = TextField(null=True)
-    message = TextField()
+    subject = HTMLTextField(null=True)
+    message = HTMLTextField()
     visibility = EnumField(Visibility, default=Visibility.TENEMENT)
     created = DateTimeField(default=datetime.now)
     # Set by customer, not by end-user.

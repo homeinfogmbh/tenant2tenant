@@ -242,7 +242,7 @@ function list (response) {
 
 	$('.btn_save_text').click(function() {
 		$('#pageloader').show();
-		updateMessageText($(this).data('id'), $(this).parent().find('#textvalue').html()).then(function(){$('#pageloader').hide();});
+		updateMessageText($(this).data('id'), $(this).parent().find('#textValue').html()).then(function(){$('#pageloader').hide();});
 	});
 
 	$('.toggle').click(function() {

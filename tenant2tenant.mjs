@@ -88,7 +88,7 @@ function listElement (record, i) {
     row.appendChild(colCreated);
 
     const colAddress = document.createElement('td');
-    colAddress.textContent = record.address.street + ' ' + record.address.houseNumber;
+    colAddress.textContent = record.address.street + ' ' + record.address.houseNumber + (record.hasOwnProperty('user') ?' (User: ' + record.user + ')' :'');
     row.appendChild(colAddress);
 
     const colMessage = document.createElement('td');
@@ -222,7 +222,16 @@ function delete_ (ident) {
     Lists the entries for the respective customer.
 */
 function list (response) {
-    const entries = response.json;
+    const entries = response[0].json;
+	
+	for (var mappingEntry of entries) {
+		for (var mapping of response[1].json) {
+			if (mappingEntry.id === mapping.tenantMessage) {
+				mappingEntry.user = mapping.user;
+				break;
+			}
+		}
+	}
 
 	entries.sort(function(b, a) {
 		return compareStrings(a.created, b.created);
@@ -439,8 +448,10 @@ export function init () {
 		$('#emails').attr('title', 'Das Ändern der E-Mails ist nicht erlaubt. Bitte kontaktieren Sie uns, damit wir dieses Modul für Sie freischalten können.');
 	}
     $('.btn_save').click(saveSettings);
-    const promiseListMessages = request.get('https://backend.homeinfo.de/tenant2tenant/message', getEnviron()).then(list);
-    return Promise.all([loadEmails(), promiseListMessages, loadAutoRelease()]).then(
+    const promiseListMessages = request.get('https://backend.homeinfo.de/tenant2tenant/message', getEnviron());
+	const promiseMessageUser = request.get('https://backend.homeinfo.de/comcat/tenant2tenant', getEnviron());
+	const messagemapping = Promise.all([promiseListMessages, promiseMessageUser]).then(list)
+    return Promise.all([loadEmails(), messagemapping, loadAutoRelease()]).then(
         function () {
             $('#pageloader').hide();
         }

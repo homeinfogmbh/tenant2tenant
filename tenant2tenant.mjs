@@ -239,13 +239,14 @@ function list (response) {
 
     const rows = [];
     let index, entry;
+	$('#messages').html("");
 
     for (const [index, entry] of enumerate(entries))
         rows.push(listElement(entry, index));
 
     if (rows.length == 0)
-        rows.append(document.createTextNode('Es wurden keine Nachrichten geschrieben.'));
-
+        rows.push(document.createTextNode('Es wurden keine Nachrichten geschrieben.'));
+	
     for (const row of rows)
 	    $('#messages').append(row);
 

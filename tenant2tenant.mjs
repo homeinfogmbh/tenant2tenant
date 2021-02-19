@@ -88,7 +88,7 @@ function listElement (record, i) {
     row.appendChild(colCreated);
 
     const colAddress = document.createElement('td');
-    colAddress.textContent = record.address.street + ' ' + record.address.houseNumber + (record.hasOwnProperty('user') ?' (User: ' + record.user + ')' :'');
+    colAddress.textContent = record.address.street + ' ' + record.address.houseNumber + (record.hasOwnProperty('user') ?' (Account: ' + record.user + ')' :'');
     row.appendChild(colAddress);
 
     const colMessage = document.createElement('td');

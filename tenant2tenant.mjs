@@ -340,9 +340,9 @@ function listEmails (response) {
     Set the autoRelease settings from the API.
 */
 function setSettings (settings) {
-	if (settings.hasOwnProperty('releaseSec')) {
-		$('#time').val(settings.releaseSec/86400); // one Day
-		if (settings.autoRelease)
+	if (settings.hasOwnProperty('json') && settings.json.hasOwnProperty('releaseSec')) {
+		$('#time').val(settings.json.releaseSec/86400); // one Day
+		if (settings.json.autoRelease)
 			$('#releasetrue').click();
 	}
 }

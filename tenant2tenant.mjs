@@ -28,7 +28,7 @@ import { enumerate } from 'https://javascript.homeinfo.de/lib.mjs';
 /*
     Returns common configuration for the datepicker tool.
 */
-function getDatepicketConfig () {
+function getDatepickerConfig () {
 	return  {
 	    constrainInput: true,
 	    monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
@@ -277,13 +277,13 @@ function list (response) {
 		delete_($(this).data('id'));
 	});
 
-	const configFrom = getDatepicketConfig();
+	const configFrom = getDatepickerConfig();
 	configFrom.onClose = function (date) {
 		updateStartDate($(this).data('id'), date);
 	};
 	$('.dateFrom').datepicker(configFrom, $.datepicker.regional['de']);
 
-	const configUntil = getDatepicketConfig();
+	const configUntil = getDatepickerConfig();
 	configUntil.firstDay = 1;
 	configUntil.onClose = function (date) {
 		updateEndDate($(this).data('id'), date);

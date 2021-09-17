@@ -328,9 +328,8 @@ function listEmails (response) {
     const emailsInput = $('#emails');
     const emailAddresses = [];
 
-    for (const email of response.json) {
+    for (const email of response.json)
         emailAddresses.push(email.email);
-    }
 
     emailsInput.val(emailAddresses.join(', '));
 }
@@ -368,9 +367,8 @@ function getEmails () {
     for (const emailAddress of emailAddresses) {
         const trimmedEmailAddress = emailAddress.trim();
 
-        if (trimmedEmailAddress != '') {
+        if (trimmedEmailAddress != '')
             emails.push({email: trimmedEmailAddress, 'html':true});
-        }
     }
 
     return emails;

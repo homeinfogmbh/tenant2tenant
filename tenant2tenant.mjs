@@ -25,9 +25,10 @@ import { request, getUser } from 'https://javascript.homeinfo.de/his/his.mjs';
 import { enumerate } from 'https://javascript.homeinfo.de/lib.mjs';
 
 
-const BASE_URL = 'https://backend.homeinfo.de/tenant2tenant/'
-const MESSAGE_URL = BASE_URL + 'message/';
-const EMAIL_URL = BASE_URL + 'email';
+const BASE_URL = 'https://backend.homeinfo.de/tenant2tenant';
+const COMCAT_URL = 'https://backend.homeinfo.de/comcat/tenant2tenant';
+const MESSAGE_URL = BASE_URL + '/message';
+const EMAIL_URL = BASE_URL + '/email';
 const DATE_PICKER_CONFIG = {
     constrainInput: true,
     monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
@@ -206,7 +207,7 @@ function toggle (ident, startDate, endDate) {
 	const promises = [];
 	promises.push(updateStartDate(ident, startDate));
 	promises.push(updateEndDate(ident, endDate));
-	promises.push(request.put(MESSAGE_URL + ident, null, getEnviron()));
+	promises.push(request.put(MESSAGE_URL + '/' + ident, null, getEnviron()));
 	Promise.all(promises).then(init);
 }
 
@@ -215,7 +216,7 @@ function toggle (ident, startDate, endDate) {
     Deletes the entry with the respective ID.
 */
 function delete_ (ident) {
-    request.delete(MESSAGE_URL + ident, getEnviron()).then(init);
+    request.delete(MESSAGE_URL + '/' + ident, getEnviron()).then(init);
 }
 
 
@@ -298,7 +299,7 @@ function list (response) {
     Updates the text of the message.
 */
 function updateMessageText (id, messageText) {
-    return request.patch(MESSAGE_URL + id, {message: messageText}, getEnviron());
+    return request.patch(MESSAGE_URL + '/' + id, {message: messageText}, getEnviron());
 }
 
 
@@ -306,7 +307,7 @@ function updateMessageText (id, messageText) {
     Updates the start date.
 */
 function updateStartDate (id, date) {
-    return request.patch(MESSAGE_URL + id, {startDate: date}, getEnviron());
+    return request.patch(MESSAGE_URL + '/' + id, {startDate: date}, getEnviron());
 }
 
 
@@ -314,7 +315,7 @@ function updateStartDate (id, date) {
     Updates the end date.
 */
 function updateEndDate (id, date) {
-    return request.patch(MESSAGE_URL + id, {endDate: date}, getEnviron());
+    return request.patch(MESSAGE_URL + '/' + id, {endDate: date}, getEnviron());
 }
 
 
@@ -445,8 +446,8 @@ export function init () {
 	}
 
     $('.btn_save').click(saveSettings);
-    const promiseListMessages = request.get('https://backend.homeinfo.de/tenant2tenant/message', getEnviron());
-	const promiseMessageUser = request.get('https://backend.homeinfo.de/comcat/tenant2tenant', getEnviron());
+    const promiseListMessages = request.get(MESSAGE_URL, getEnviron());
+	const promiseMessageUser = request.get(COMCAT_URL, getEnviron());
 	const messagemapping = Promise.all([promiseListMessages, promiseMessageUser]).then(list)
     return Promise.all([loadEmails(), messagemapping, loadAutoRelease()]).then(
         function () {

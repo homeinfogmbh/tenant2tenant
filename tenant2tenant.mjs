@@ -27,6 +27,7 @@ import { enumerate } from 'https://javascript.homeinfo.de/lib.mjs';
 
 const BASE_URL = 'https://backend.homeinfo.de/tenant2tenant';
 const COMCAT_URL = 'https://backend.homeinfo.de/comcat/tenant2tenant';
+const CONFIG_URL = BASE_URL + '/configuration';
 const MESSAGE_URL = BASE_URL + '/message';
 const EMAIL_URL = BASE_URL + '/email';
 const DATE_PICKER_CONFIG = {
@@ -413,7 +414,7 @@ function saveEmails () {
     Loads the configuration.
 */
 function loadAutoRelease () {
-    return request.get('https://backend.homeinfo.de/tenant2tenant/configuration', getEnviron()).then(setSettings);
+    return request.get(CONFIG_URL, getEnviron()).then(setSettings);
 }
 
 
@@ -425,7 +426,7 @@ function saveAutoRelease () {
 	    'autoRelease': $('input[name=autorelease]:checked').val() === 'true',
 	    'releaseSec': parseInt($('#time').val()) * 86400
     };
-    return request.post('https://backend.homeinfo.de/tenant2tenant/configuration', json, getEnviron());
+    return request.post(CONFIG_URL, json, getEnviron());
 }
 
 

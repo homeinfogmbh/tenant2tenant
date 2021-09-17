@@ -25,20 +25,18 @@ import { request, getUser } from 'https://javascript.homeinfo.de/his/his.mjs';
 import { enumerate } from 'https://javascript.homeinfo.de/lib.mjs';
 
 
-/*
-    Returns common configuration for the datepicker tool.
-*/
-function getDatepickerConfig () {
-	return  {
-	    constrainInput: true,
-	    monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
-	    monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun', 'Jul','Aug','Sep','Okt','Nov','Dez'],
-	    dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
-	    dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-	    dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
-	    dateFormat : 'yy-mm-dd'
-    };
-}
+const BASE_URL = 'https://backend.homeinfo.de/tenant2tenant/'
+const MESSAGE_URL = BASE_URL + 'message/';
+const EMAIL_URL = BASE_URL + 'email';
+const DATE_PICKER_CONFIG = {
+    constrainInput: true,
+    monthNames: ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
+    monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun', 'Jul','Aug','Sep','Okt','Nov','Dez'],
+    dayNames: ['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'],
+    dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+    dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
+    dateFormat : 'yy-mm-dd'
+};
 
 
 /*
@@ -165,6 +163,7 @@ function listElement (record, i) {
     iDelete.style.paddingLeft = '5px';
     colDelete.appendChild(iDelete);
     colDelete.appendChild(document.createElement('br'));
+
     const fontDelete = document.createElement('font');
     fontDelete.classList.add('confirm');
     fontDelete.classList.add('deleteconfirm');
@@ -172,6 +171,7 @@ function listElement (record, i) {
     fontDelete.style.float = 'right';
     fontDelete.appendChild(document.createTextNode('Sicher?'))
     fontDelete.appendChild(document.createElement('br'));
+
     const aConfirmDelete = document.createElement('a');
     aConfirmDelete.classList.add('delete');
     aConfirmDelete.classList.add('no_drag');
@@ -181,6 +181,7 @@ function listElement (record, i) {
     aConfirmDelete.textContent = 'ja';
     fontDelete.appendChild(aConfirmDelete);
     fontDelete.appendChild(document.createTextNode(' / '));
+
     const aCancelDelete = document.createElement('a')
     aCancelDelete.classList.add('confirmdelete');
     aCancelDelete.classList.add('no_drag');
@@ -205,7 +206,7 @@ function toggle (ident, startDate, endDate) {
 	const promises = [];
 	promises.push(updateStartDate(ident, startDate));
 	promises.push(updateEndDate(ident, endDate));
-	promises.push(request.put('https://backend.homeinfo.de/tenant2tenant/message/' + ident, null, getEnviron()));
+	promises.push(request.put(MESSAGE_URL + ident, null, getEnviron()));
 	Promise.all(promises).then(init);
 }
 
@@ -214,7 +215,7 @@ function toggle (ident, startDate, endDate) {
     Deletes the entry with the respective ID.
 */
 function delete_ (ident) {
-    request.delete('https://backend.homeinfo.de/tenant2tenant/message/' + ident, getEnviron()).then(init);
+    request.delete(MESSAGE_URL + ident, getEnviron()).then(init);
 }
 
 
@@ -277,14 +278,13 @@ function list (response) {
 		delete_($(this).data('id'));
 	});
 
-	const configFrom = getDatepickerConfig();
+	const configFrom = Object.assign({}, DATE_PICKER_CONFIG);
 	configFrom.onClose = function (date) {
 		updateStartDate($(this).data('id'), date);
 	};
 	$('.dateFrom').datepicker(configFrom, $.datepicker.regional['de']);
 
-	const configUntil = getDatepickerConfig();
-	configUntil.firstDay = 1;
+	const configUntil = Object.assign({firstDay: 1}, DATE_PICKER_CONFIG);
 	configUntil.onClose = function (date) {
 		updateEndDate($(this).data('id'), date);
 	};
@@ -298,8 +298,7 @@ function list (response) {
     Updates the text of the message.
 */
 function updateMessageText (id, messageText) {
-    const json = {message: messageText};
-    return request.patch('https://backend.homeinfo.de/tenant2tenant/message/' + id, json, getEnviron());
+    return request.patch(MESSAGE_URL + id, {message: messageText}, getEnviron());
 }
 
 
@@ -307,8 +306,7 @@ function updateMessageText (id, messageText) {
     Updates the start date.
 */
 function updateStartDate (id, date) {
-    const json = {startDate: date};
-    return request.patch('https://backend.homeinfo.de/tenant2tenant/message/' + id, json, getEnviron());
+    return request.patch(MESSAGE_URL + id, {startDate: date}, getEnviron());
 }
 
 
@@ -316,8 +314,7 @@ function updateStartDate (id, date) {
     Updates the end date.
 */
 function updateEndDate (id, date) {
-    const json = {endDate: date};
-    return request.patch('https://backend.homeinfo.de/tenant2tenant/message/' + id, json, getEnviron());
+    return request.patch(MESSAGE_URL + id, {endDate: date}, getEnviron());
 }
 
 
@@ -351,7 +348,7 @@ function setSettings (settings) {
     Loads the configured email addresses from the API.
 */
 function loadEmails () {
-    return request.get('https://backend.homeinfo.de/tenant2tenant/email', getEnviron()).then(listEmails);
+    return request.get(EMAIL_URL, getEnviron()).then(listEmails);
 }
 
 
@@ -396,7 +393,7 @@ function saveSettings () {
     Saves the set emails.
 */
 function saveEmails () {
-    return request.post('https://backend.homeinfo.de/tenant2tenant/email', getEmails(), getEnviron()).then(
+    return request.post(EMAIL_URL, getEmails(), getEnviron()).then(
         loadEmails,
         function (error) {
             console.log('Error: ' + JSON.stringify(error));
@@ -446,6 +443,7 @@ export function init () {
 		$('.btn_save').attr('disabled', 'disabled');
 		$('#emails').attr('title', 'Das Ändern der E-Mails ist nicht erlaubt. Bitte kontaktieren Sie uns, damit wir dieses Modul für Sie freischalten können.');
 	}
+
     $('.btn_save').click(saveSettings);
     const promiseListMessages = request.get('https://backend.homeinfo.de/tenant2tenant/message', getEnviron());
 	const promiseMessageUser = request.get('https://backend.homeinfo.de/comcat/tenant2tenant', getEnviron());

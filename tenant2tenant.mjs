@@ -227,11 +227,13 @@ function delete_ (ident) {
 function list (response) {
     const entries = response[0].json;
 	
-	for (var mappingEntry of entries) {
-		for (var mapping of response[1].json) {
-			if (mappingEntry.id === mapping.tenantMessage) {
-				mappingEntry.user = mapping.user;
-				break;
+	if (response.length > 1) {
+		for (var mappingEntry of entries) {
+			for (var mapping of response[1].json) {
+				if (mappingEntry.id === mapping.tenantMessage) {
+					mappingEntry.user = mapping.user;
+					break;
+				}
 			}
 		}
 	}
@@ -448,8 +450,8 @@ export function init () {
 
     $('.btn_save').click(saveSettings);
     const promiseListMessages = request.get(MESSAGE_URL, getEnviron());
-	const promiseMessageUser = request.get(COMCAT_URL, getEnviron());
-	const messagemapping = Promise.all([promiseListMessages, promiseMessageUser]).then(list)
+	//const promiseMessageUser = request.get(COMCAT_URL, getEnviron());
+	const messagemapping = Promise.all([promiseListMessages/*, promiseMessageUser*/]).then(list)
     return Promise.all([loadEmails(), messagemapping, loadAutoRelease()]).then(
         function () {
             $('#pageloader').hide();

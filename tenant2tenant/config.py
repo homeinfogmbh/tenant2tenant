@@ -1,9 +1,11 @@
 """Configuration file parser."""
 
-from configlib import loadcfg
+from functools import cache, partial
+
+from configlib import load_config
 
 
-__all__ = ['CONFIG']
+__all__ = ['get_config']
 
 
-CONFIG = loadcfg('tenant2tenant.conf')
+get_config = partial(cache(load_config), 'tenant2tenant.conf')

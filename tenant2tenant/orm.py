@@ -14,17 +14,16 @@ from peewee import ModelSelect
 from hwdb import Deployment
 from mdb import Address, Company, Customer
 from notificationlib import get_email_orm_model
-from peeweeplus import EnumField, HTMLTextField, JSONModel, MySQLDatabase
+from peeweeplus import EnumField, HTMLTextField, JSONModel, MySQLDatabaseProxy
 
 from tenant2tenant import dom   # pylint: disable=E0611
-from tenant2tenant.config import CONFIG
 from tenant2tenant.enumerations import Visibility
 
 
 __all__ = ['Configuration', 'TenantMessage', 'NotificationEmail']
 
 
-DATABASE = MySQLDatabase.from_config(CONFIG['db'])
+DATABASE = MySQLDatabaseProxy('tenant2tenant')
 
 
 class _Tenant2TenantModel(JSONModel):   # pylint: disable=R0903

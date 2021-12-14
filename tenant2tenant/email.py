@@ -20,7 +20,7 @@ def get_emails(message: str) -> Iterator[EMail]:
     for notification_email in NotificationEmail.select().where(
             NotificationEmail.customer == message.customer):
         recipient = notification_email.email
-        sender = (config := get_config).get('email', 'from')
+        sender = (config := get_config()).get('email', 'from')
         subject = notification_email.subject or config.get('email', 'subject')
         subject = subject.format(address=message.address)
         html = message.message if notification_email.html else None

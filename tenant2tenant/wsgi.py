@@ -3,7 +3,7 @@
 from typing import Union
 
 from flask import request
-from peewee import ModelSelect
+from peewee import Select
 
 from his import CUSTOMER, authenticated, authorized, Application
 from hwdb import Deployment
@@ -23,11 +23,14 @@ APPLICATION = Application('Tenant-to-tenant', debug=True)
 ALLOWED_PATCH_FIELDS = ('startDate', 'endDate', 'released', 'message')
 SKIPPED_PATCH_FIELDS = set(
     key for key, *_ in TenantMessage.get_json_fields()
-    if key not in ALLOWED_PATCH_FIELDS)
+    if key not in ALLOWED_PATCH_FIELDS
+)
 
 
-def _get_messages(customer: Union[Customer, int],
-                  released: Union[bool, None]) -> ModelSelect:
+def _get_messages(
+        customer: Union[Customer, int],
+        released: Union[bool, None]
+) -> Select:
     """Yields the customer's tenant-to-tenant messages."""
 
     expression = TenantMessage.customer == customer
@@ -69,12 +72,18 @@ def _get_message(ident: int) -> TenantMessage:
 def list_messages() -> JSON:
     """Lists the tenant-to-tenant messages."""
 
-    return JSON([message.to_json() for message in _get_messages(
-        CUSTOMER.id, _get_released())])
+    return JSON([
+        message.to_json() for message in _get_messages(
+            CUSTOMER.id, _get_released()
+        )
+    ])
 
 
-@APPLICATION.route('/message/<int:ident>', methods=['GET'],
-                   strict_slashes=False)
+@APPLICATION.route(
+    '/message/<int:ident>',
+    methods=['GET'],
+    strict_slashes=False
+)
 @authenticated
 @authorized('tenant2tenant')
 def get_message(ident: int) -> JSON:
@@ -83,8 +92,11 @@ def get_message(ident: int) -> JSON:
     return JSON(_get_message(ident).to_json())
 
 
-@APPLICATION.route('/message/<int:ident>', methods=['PUT'],
-                   strict_slashes=False)
+@APPLICATION.route(
+    '/message/<int:ident>',
+    methods=['PUT'],
+    strict_slashes=False
+)
 @authenticated
 @authorized('tenant2tenant')
 def toggle_message(ident: int) -> JSONMessage:
@@ -93,12 +105,18 @@ def toggle_message(ident: int) -> JSONMessage:
     message = _get_message(ident)
     message.released = not message.released
     message.save()
-    return JSONMessage('The message has been toggled.',
-                       released=message.released, status=200)
+    return JSONMessage(
+        'The message has been toggled.',
+        released=message.released,
+        status=200
+    )
 
 
-@APPLICATION.route('/message/<int:ident>', methods=['PATCH'],
-                   strict_slashes=False)
+@APPLICATION.route(
+    '/message/<int:ident>',
+    methods=['PATCH'],
+    strict_slashes=False
+)
 @authenticated
 @authorized('tenant2tenant')
 def patch_message(ident: int) -> JSONMessage:
@@ -110,8 +128,11 @@ def patch_message(ident: int) -> JSONMessage:
     return JSONMessage('The message has been updated.', status=200)
 
 
-@APPLICATION.route('/message/<int:ident>', methods=['DELETE'],
-                   strict_slashes=False)
+@APPLICATION.route(
+    '/message/<int:ident>',
+    methods=['DELETE'],
+    strict_slashes=False
+)
 @authenticated
 @authorized('tenant2tenant')
 def delete_message(ident: int) -> JSONMessage:
@@ -140,7 +161,8 @@ def set_config() -> JSONMessage:
     """Sets the configuration for the respective customer."""
     try:
         configuration = Configuration.select(cascade=True).where(
-            Configuration.customer == CUSTOMER.id).get()
+            Configuration.customer == CUSTOMER.id
+        ).get()
     except Configuration.DoesNotExist:
         configuration = Configuration.from_json(request.json)
         configuration.customer = CUSTOMER.id
@@ -168,10 +190,10 @@ def preview_deployment(deployment: Union[Deployment, int]) -> XML:
     return XML(xml)
 
 
-APPLICATION.add_routes((
+APPLICATION.add_routes([
     ('GET', '/email', GET_EMAILS),
     ('POST', '/email', SET_EMAILS)
-))
+])
 
 
 @APPLICATION.errorhandler(Configuration.DoesNotExist)

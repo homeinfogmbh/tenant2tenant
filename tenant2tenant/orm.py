@@ -9,14 +9,14 @@ from peewee import BooleanField
 from peewee import DateField
 from peewee import DateTimeField
 from peewee import ForeignKeyField
-from peewee import ModelSelect
+from peewee import Select
 
 from hwdb import Deployment
 from mdb import Address, Company, Customer
 from notificationlib import get_email_orm_model
 from peeweeplus import EnumField, HTMLTextField, JSONModel, MySQLDatabaseProxy
 
-from tenant2tenant import dom   # pylint: disable=E0611
+from tenant2tenant import dom
 from tenant2tenant.enumerations import Visibility
 
 
@@ -43,13 +43,14 @@ class Configuration(_Tenant2TenantModel):
     release_sec = BigIntegerField(default=432000)
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+    def select(cls, *args, cascade: bool = False) -> Select:
         """Selects configurations."""
         if not cascade:
-            return super().select(*args, **kwargs)
+            return super().select(*args)
 
-        args = {cls, Customer, Company, *args}
-        return super().select(*args, **kwargs).join(Customer).join(Company)
+        return super().select(*{
+            cls, Customer, Company, *args
+        }).join(Customer).join(Company)
 
     @classmethod
     def for_customer(cls, customer: Union[Customer, int]) -> Configuration:
@@ -69,7 +70,7 @@ class Configuration(_Tenant2TenantModel):
 class TenantMessage(_Tenant2TenantModel):
     """Tenant to tenant messages."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         table_name = 'tenant_message'
 
     customer = ForeignKeyField(
@@ -85,22 +86,31 @@ class TenantMessage(_Tenant2TenantModel):
     end_date = DateField(null=True, default=None)
 
     @classmethod
-    def add(cls, customer: Union[Customer, int], address: Union[Address, int],
-            message: str) -> TenantMessage:
+    def add(
+            cls,
+            customer: Union[Customer, int],
+            address: Union[Address, int],
+            message: str
+    ) -> TenantMessage:
         """Creates a new entry for the respective customer and address."""
         record = cls(customer=customer, address=address, message=message)
         record.save()
         return record
 
     @classmethod
-    def from_deployment(cls, deployment: Union[Deployment, int],
-                        message: str) -> TenantMessage:
+    def from_deployment(
+            cls,
+            deployment: Union[Deployment, int],
+            message: str
+    ) -> TenantMessage:
         """Creates a new entry for the respective deployment."""
         return cls.add(deployment.customer, deployment.address, message)
 
     @classmethod
-    def for_deployment(cls, deployment: Union[Deployment, int]) \
-            -> TenantMessage:
+    def for_deployment(
+            cls,
+            deployment: Union[Deployment, int]
+    ) -> TenantMessage:
         """Yields released, active records for the respective deployment."""
         condition = cls.customer == deployment.customer
         condition &= cls.address == deployment.address
@@ -111,14 +121,14 @@ class TenantMessage(_Tenant2TenantModel):
         return cls.select(cascade=True).where(condition)
 
     @classmethod
-    def select(cls, *args, cascade: bool = False, **kwargs) -> ModelSelect:
+    def select(cls, *args, cascade: bool = False) -> Select:
         """Selects configurations."""
         if not cascade:
-            return super().select(*args, **kwargs)
+            return super().select(*args)
 
-        args = {cls, Customer, Company, Address, *args}
-        return super().select(*args, **kwargs).join(
-            Customer).join(Company).join_from(cls, Address)
+        return super().select(*{
+            cls, Customer, Company, Address, *args
+        }).join(Customer).join(Company).join_from(cls, Address)
 
     @property
     def active(self) -> bool:

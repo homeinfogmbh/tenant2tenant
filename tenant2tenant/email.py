@@ -18,7 +18,8 @@ def get_emails(message: str) -> Iterator[EMail]:
     """Yields notification emails."""
 
     for notification_email in NotificationEmail.select().where(
-            NotificationEmail.customer == message.customer):
+            NotificationEmail.customer == message.customer
+    ):
         recipient = notification_email.email
         sender = (config := get_config()).get('email', 'from')
         subject = notification_email.subject or config.get('email', 'subject')
@@ -28,4 +29,4 @@ def get_emails(message: str) -> Iterator[EMail]:
         yield EMail(subject, sender, recipient, plain=plain, html=html)
 
 
-email = get_email_func(get_emails)  # pylint: disable=C0103
+email = get_email_func(get_emails)

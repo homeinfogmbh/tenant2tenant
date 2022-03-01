@@ -26,10 +26,10 @@ __all__ = ['Configuration', 'TenantMessage', 'NotificationEmail']
 DATABASE = MySQLDatabaseProxy('tenant2tenant')
 
 
-class _Tenant2TenantModel(JSONModel):   # pylint: disable=R0903
+class _Tenant2TenantModel(JSONModel):
     """Basic model for this database."""
 
-    class Meta:     # pylint: disable=C0111,R0903
+    class Meta:
         database = DATABASE
         schema = database.database
 

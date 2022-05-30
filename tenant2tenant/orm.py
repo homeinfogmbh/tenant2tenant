@@ -38,7 +38,8 @@ class Configuration(_Tenant2TenantModel):
     """Customer-specific configuration."""
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE', lazy_load=False)
+        Customer, column_name='customer', on_delete='CASCADE', lazy_load=False
+    )
     auto_release = BooleanField(default=False)
     release_sec = BigIntegerField(default=432000)
 
@@ -74,7 +75,8 @@ class TenantMessage(_Tenant2TenantModel):
         table_name = 'tenant_message'
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', lazy_load=False)
+        Customer, column_name='customer', lazy_load=False
+    )
     address = ForeignKeyField(Address, column_name='address', lazy_load=False)
     subject = HTMLTextField(null=True)
     message = HTMLTextField()
@@ -126,9 +128,9 @@ class TenantMessage(_Tenant2TenantModel):
         if not cascade:
             return super().select(*args)
 
-        return super().select(*{
+        return super().select(
             cls, Customer, Company, Address, *args
-        }).join(Customer).join(Company).join_from(cls, Address)
+        ).join(Customer).join(Company).join_from(cls, Address)
 
     @property
     def active(self) -> bool:

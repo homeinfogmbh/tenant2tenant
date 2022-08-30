@@ -58,7 +58,8 @@ class Configuration(_Tenant2TenantModel):
         """Returns the configuration for the respective customer."""
         try:
             return cls.select(cascade=True).where(
-                cls.customer == customer).get()
+                cls.customer == customer
+            ).get()
         except cls.DoesNotExist:
             return cls(customer=customer)
 

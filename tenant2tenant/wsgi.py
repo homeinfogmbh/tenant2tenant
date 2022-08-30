@@ -1,5 +1,6 @@
 """Authenticated and authorized HIS services."""
 
+from datetime import date
 from typing import Union
 
 from flask import request
@@ -184,7 +185,9 @@ def preview_deployment(deployment: Union[Deployment, int]) -> XML:
 
     xml = tenant2tenant()
 
-    for message in TenantMessage.for_deployment(deployment):
+    for message in TenantMessage.for_deployment(
+            deployment, released=True, active_on=date.today()
+    ):
         xml.message.append(message.to_dom())
 
     return XML(xml)

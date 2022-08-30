@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 from datetime import datetime, date, timedelta
-from typing import Union
+from typing import Optional, Union
 
 from peewee import BigIntegerField
 from peewee import BooleanField
@@ -111,15 +111,24 @@ class TenantMessage(_Tenant2TenantModel):
     @classmethod
     def for_deployment(
             cls,
-            deployment: Union[Deployment, int]
+            deployment: Union[Deployment, int],
+            *,
+            released: bool = True,
+            active_on: Optional[date] = None
     ) -> TenantMessage:
         """Yields released, active records for the respective deployment."""
         condition = cls.customer == deployment.customer
         condition &= cls.address == deployment.address
-        condition &= cls.released == 1
-        today = date.today()
-        condition &= (cls.start_date >> None) | (cls.start_date <= today)
-        condition &= (cls.end_date >> None) | (cls.end_date >= today)
+
+        if released:
+            condition &= cls.released == 1
+
+        if active_on is not None:
+            condition &= (
+                ((cls.start_date >> None) | (cls.start_date <= active_on))
+                & ((cls.end_date >> None) | (cls.end_date >= active_on))
+            )
+
         return cls.select(cascade=True).where(condition)
 
     @classmethod

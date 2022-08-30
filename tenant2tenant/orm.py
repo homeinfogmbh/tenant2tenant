@@ -49,9 +49,9 @@ class Configuration(_Tenant2TenantModel):
         if not cascade:
             return super().select(*args)
 
-        return super().select(*{
+        return super().select(
             cls, Customer, Company, *args
-        }).join(Customer).join(Company)
+        ).join(Customer).join(Company)
 
     @classmethod
     def for_customer(cls, customer: Union[Customer, int]) -> Configuration:

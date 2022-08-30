@@ -9,7 +9,7 @@ from peewee import BooleanField
 from peewee import DateField
 from peewee import DateTimeField
 from peewee import ForeignKeyField
-from peewee import Select
+from peewee import ModelSelect
 
 from hwdb import Deployment
 from mdb import Address, Company, Customer
@@ -44,7 +44,7 @@ class Configuration(_Tenant2TenantModel):
     release_sec = BigIntegerField(default=432000)
 
     @classmethod
-    def select(cls, *args, cascade: bool = False) -> Select:
+    def select(cls, *args, cascade: bool = False) -> ModelSelect:
         """Selects configurations."""
         if not cascade:
             return super().select(*args)
@@ -115,7 +115,7 @@ class TenantMessage(_Tenant2TenantModel):
             *,
             released: bool = True,
             active_on: Optional[date] = None
-    ) -> TenantMessage:
+    ) -> ModelSelect:
         """Yields released, active records for the respective deployment."""
         condition = cls.customer == deployment.customer
         condition &= cls.address == deployment.address
@@ -132,7 +132,7 @@ class TenantMessage(_Tenant2TenantModel):
         return cls.select(cascade=True).where(condition)
 
     @classmethod
-    def select(cls, *args, cascade: bool = False) -> Select:
+    def select(cls, *args, cascade: bool = False) -> ModelSelect:
         """Selects configurations."""
         if not cascade:
             return super().select(*args)

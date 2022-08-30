@@ -6,7 +6,7 @@ from enum import Enum
 __all__ = ['Visibility']
 
 
-class Visibility(Enum):
+class Visibility(str, Enum):
     """Visibility of tenant-to-tenant messages."""
 
     TENEMENT = 'tenement'

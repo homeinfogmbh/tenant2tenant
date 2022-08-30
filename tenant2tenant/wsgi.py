@@ -151,7 +151,8 @@ def get_config() -> Union[JSON, JSONMessage]:
     """Returns the configuration of the respective customer."""
 
     configuration = Configuration.select(cascade=True).where(
-        Configuration.customer == CUSTOMER.id).get()
+        Configuration.customer == CUSTOMER.id
+    ).get()
     return JSON(configuration.to_json())
 
 
@@ -203,8 +204,10 @@ APPLICATION.add_routes([
 def handle_missing_configuration(_: Configuration.DoesNotExist) -> JSONMessage:
     """Handles missing configuration."""
 
-    return JSONMessage('The requested configuration does not exist.',
-                       status=404)
+    return JSONMessage(
+        'The requested configuration does not exist.',
+        status=404
+    )
 
 
 @APPLICATION.errorhandler(TenantMessage.DoesNotExist)

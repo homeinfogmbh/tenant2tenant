@@ -203,8 +203,15 @@ function listElement (record, i) {
     between released and not released.
 */
 function toggle (ident, startDate, endDate) {
+	const oneweek = new Date();
+	oneweek.setDate(oneweek.getDate() + 7);
+	const month = ('0' + (oneweek.getMonth() + 1)).slice(-2);
+	const day = ('0' + oneweek.getDate()).slice(-2);
+	const enddatestring = oneweek.getFullYear() + '-' + month + '-' + day;
+
+
 	startDate = startDate === '' || startDate == null ?null :startDate;
-	endDate = endDate === '' || endDate == null ?null :endDate;
+	endDate = endDate === '' || endDate == null ?enddatestring :endDate;
 	const promises = [];
 	promises.push(updateStartDate(ident, startDate));
 	promises.push(updateEndDate(ident, endDate));

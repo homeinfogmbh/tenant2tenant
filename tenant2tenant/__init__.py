@@ -6,10 +6,4 @@ from tenant2tenant.orm import Configuration, TenantMessage
 from tenant2tenant.wsgi import APPLICATION
 
 
-__all__ = [
-    'APPLICATION',
-    'email',
-    'Configuration',
-    'TenantMessage',
-    'Visibility'
-]
+__all__ = ["APPLICATION", "email", "Configuration", "TenantMessage", "Visibility"]

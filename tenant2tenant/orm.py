@@ -20,10 +20,10 @@ from tenant2tenant import dom
 from tenant2tenant.enumerations import Visibility
 
 
-__all__ = ['Configuration', 'TenantMessage', 'NotificationEmail']
+__all__ = ["Configuration", "TenantMessage", "NotificationEmail"]
 
 
-DATABASE = MySQLDatabaseProxy('tenant2tenant')
+DATABASE = MySQLDatabaseProxy("tenant2tenant")
 
 
 class _Tenant2TenantModel(JSONModel):
@@ -38,7 +38,7 @@ class Configuration(_Tenant2TenantModel):
     """Customer-specific configuration."""
 
     customer = ForeignKeyField(
-        Customer, column_name='customer', on_delete='CASCADE', lazy_load=False
+        Customer, column_name="customer", on_delete="CASCADE", lazy_load=False
     )
     auto_release = BooleanField(default=False)
     release_sec = BigIntegerField(default=432000)
@@ -49,17 +49,15 @@ class Configuration(_Tenant2TenantModel):
         if not cascade:
             return super().select(*args)
 
-        return super().select(
-            cls, Customer, Company, *args
-        ).join(Customer).join(Company)
+        return (
+            super().select(cls, Customer, Company, *args).join(Customer).join(Company)
+        )
 
     @classmethod
     def for_customer(cls, customer: Union[Customer, int]) -> Configuration:
         """Returns the configuration for the respective customer."""
         try:
-            return cls.select(cascade=True).where(
-                cls.customer == customer
-            ).get()
+            return cls.select(cascade=True).where(cls.customer == customer).get()
         except cls.DoesNotExist:
             return cls(customer=customer)
 
@@ -73,12 +71,10 @@ class TenantMessage(_Tenant2TenantModel):
     """Tenant to tenant messages."""
 
     class Meta:
-        table_name = 'tenant_message'
+        table_name = "tenant_message"
 
-    customer = ForeignKeyField(
-        Customer, column_name='customer', lazy_load=False
-    )
-    address = ForeignKeyField(Address, column_name='address', lazy_load=False)
+    customer = ForeignKeyField(Customer, column_name="customer", lazy_load=False)
+    address = ForeignKeyField(Address, column_name="address", lazy_load=False)
     subject = HTMLTextField(null=True)
     message = HTMLTextField()
     visibility = EnumField(Visibility, default=Visibility.TENEMENT)
@@ -90,10 +86,7 @@ class TenantMessage(_Tenant2TenantModel):
 
     @classmethod
     def add(
-            cls,
-            customer: Union[Customer, int],
-            address: Union[Address, int],
-            message: str
+        cls, customer: Union[Customer, int], address: Union[Address, int], message: str
     ) -> TenantMessage:
         """Creates a new entry for the respective customer and address."""
         record = cls(customer=customer, address=address, message=message)
@@ -102,20 +95,18 @@ class TenantMessage(_Tenant2TenantModel):
 
     @classmethod
     def from_deployment(
-            cls,
-            deployment: Union[Deployment, int],
-            message: str
+        cls, deployment: Union[Deployment, int], message: str
     ) -> TenantMessage:
         """Creates a new entry for the respective deployment."""
         return cls.add(deployment.customer, deployment.address, message)
 
     @classmethod
     def for_deployment(
-            cls,
-            deployment: Union[Deployment, int],
-            *,
-            released: bool = True,
-            active_on: Optional[date] = None
+        cls,
+        deployment: Union[Deployment, int],
+        *,
+        released: bool = True,
+        active_on: Optional[date] = None,
     ) -> ModelSelect:
         """Yields released, active records for the respective deployment."""
         condition = cls.customer == deployment.customer
@@ -125,9 +116,8 @@ class TenantMessage(_Tenant2TenantModel):
             condition &= cls.released == 1
 
         if active_on is not None:
-            condition &= (
-                ((cls.start_date >> None) | (cls.start_date <= active_on))
-                & ((cls.end_date >> None) | (cls.end_date >= active_on))
+            condition &= ((cls.start_date >> None) | (cls.start_date <= active_on)) & (
+                (cls.end_date >> None) | (cls.end_date >= active_on)
             )
 
         return cls.select(cascade=True).where(condition)
@@ -138,9 +128,13 @@ class TenantMessage(_Tenant2TenantModel):
         if not cascade:
             return super().select(*args)
 
-        return super().select(
-            cls, Customer, Company, Address, *args
-        ).join(Customer).join(Company).join_from(cls, Address)
+        return (
+            super()
+            .select(cls, Customer, Company, Address, *args)
+            .join(Customer)
+            .join(Company)
+            .join_from(cls, Address)
+        )
 
     @property
     def active(self) -> bool:
@@ -155,7 +149,7 @@ class TenantMessage(_Tenant2TenantModel):
         json = super().to_json(**kwargs)
 
         if address:
-            json['address'] = self.address.to_json()
+            json["address"] = self.address.to_json()
 
         return json
 
